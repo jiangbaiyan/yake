@@ -27,7 +27,7 @@ trait ApiRequest{
             $result = $client->request($requestType,$url,[
                 'json' => $params
             ]);
-        }catch (GuzzleException $exception){
+        }catch (GuzzleException $e){
             return $this->responseOperationFailed('request failed');
         }
         return json_decode($result);

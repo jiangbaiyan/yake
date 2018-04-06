@@ -8,8 +8,10 @@
 namespace App\Helper;
 
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 trait ApiResponse{
+
     /**
      * @var string 成功状态码
      */
@@ -36,7 +38,7 @@ trait ApiResponse{
      * @return \Illuminate\Http\JsonResponse
      */
     public function response($status,$msg = '',$data = []){
-        return Response::json(compact($status,$msg,$data));
+        return Response::json(compact('status','msg','data'));
     }
 
     /**
@@ -63,7 +65,7 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseParamMissed($msg = 'missing parameters'){
+    public function responseParamValidateFailed($msg = 'missing or wrong parameters'){
         return $this->response($this::$CODE_PARAM_MISSED,$msg);
     }
 
@@ -93,4 +95,5 @@ trait ApiResponse{
     public function responsePermissionDenied($msg = 'permission denied'){
         return $this->response($this::$CODE_PERMISSION_DENIED,$msg);
     }
+
 }

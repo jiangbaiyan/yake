@@ -11,6 +11,14 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group(['prefix' => 'v1'],function (){
+    Route::group(['prefix' => 'common'],function (){
+
+        //获取验证码
+        Route::post('getCode','Common\RegisterController@getCode');
+
+        //验证验证码
+        Route::post('verifyCode','Common\RegisterController@verifyCode');
+
+    });
 });
