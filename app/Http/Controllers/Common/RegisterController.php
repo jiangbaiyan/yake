@@ -56,7 +56,7 @@ class RegisterController extends Controller{
         }
         else{
             Log::info('用户'.$phone.'短信验证失败');
-            return $this->responseOperationFailed('wrong code');
+            return $this->responseOperationFailed();
         }
     }
 

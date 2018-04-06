@@ -9,6 +9,7 @@ namespace App\Service\Common;
 
 use Flc\Dysms\Client;
 use Flc\Dysms\Request\SendSms;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 
 class SmsService{
@@ -30,9 +31,9 @@ class SmsService{
         $sendSms->setPhoneNumbers($phone);
         $sendSms->setSignName('帮帮吧');
         $sendSms->setTemplateCode('SMS_126460515');
-        $code = rand(100000, 999999);
-        //设置session，为验证接口使用
-        Session::put($phone.'Code',$code);
+        $code = rand(1000, 9999);
+        //设置Cache，为验证接口使用
+        Cache::put($phone.'Code',$code,3);
         $sendSms->setTemplateParam(compact('code'));
         $res = $client->execute($sendSms);
         $res = json_decode(json_encode($res),true);
@@ -52,7 +53,10 @@ class SmsService{
      * @return bool
      */
     public static function verifyCode($phone,$frontCode){
-        $backCode = Session::get($phone.'Code');
+        $backCode = Cache::get($phone.'Code');
+        if (!$backCode){
+            return false;
+        }
         return $frontCode == $backCode;
     }
 }
