@@ -30,8 +30,7 @@ class SmsService{
         $sendSms->setPhoneNumbers($phone);
         $sendSms->setSignName('帮帮吧');
         $sendSms->setTemplateCode('SMS_126460515');
-        //$code = rand(100000, 999999);
-        $code = 123456;
+        $code = rand(100000, 999999);
         //设置session，为验证接口使用
         Session::put($phone.'Code',$code);
         $sendSms->setTemplateParam(compact('code'));

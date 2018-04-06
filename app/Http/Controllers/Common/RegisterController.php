@@ -29,7 +29,7 @@ class RegisterController extends Controller{
         $res = SmsService::getCode($phone);
         //如果返回的不是数组（只有报错才返回数组），那么直接返回验证码
         if (!is_array($res)){
-            Log::info('semd code to'.$phone.'successfully');
+            Log::info('send code to'.$phone.'successfully');
             return $this->responseSuccess($res);
         }
         else{
