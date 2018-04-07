@@ -39,7 +39,7 @@ class SmsService{
         $res = json_decode(json_encode($res),true);
         //发送成功，返回验证码字符串
         if ($res['Code'] == 'OK'){
-            return $code;
+            return true;
         }//发送失败返回失败信息数组
         else{
             return $res;

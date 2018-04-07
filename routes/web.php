@@ -20,5 +20,6 @@ Route::group(['prefix' => 'v1'],function (){
         //验证验证码
         Route::post('verifyCode','Common\RegisterController@verifyCode');
 
+        Route::get('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
     });
 });

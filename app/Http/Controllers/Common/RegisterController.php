@@ -9,6 +9,7 @@
 namespace App\Http\Controllers\Common;
 use App\Http\Helper\Controller;
 use App\Service\Common\SmsService;
+use App\Service\Common\WeChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -27,10 +28,10 @@ class RegisterController extends Controller{
         }
         $phone = $request->phone;
         $res = SmsService::getCode($phone);
-        //如果返回的不是数组（只有报错才返回数组），那么直接返回验证码
-        if (!is_array($res)){
+        //成功返回true，报错返回数组
+        if (is_bool($res)){
             Log::info('send code to'.$phone.'successfully');
-            return $this->responseSuccess($res);
+            return $this->responseSuccess();
         }
         else{
             Log::error($res);
@@ -60,4 +61,25 @@ class RegisterController extends Controller{
         }
     }
 
+    /**
+     * 微信网页授权并拉取用户个人信息
+     * @param $step
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getWeChatUserInfo($step,Request $request){
+        switch ($step){
+            case 1:
+                WeChatService::getCode();
+                break;
+            case 2:
+                $res = WeChatService::callback($request);
+                //如果返回的是数组，说明有错误
+                if (is_array($res)){
+                    return $this->responseOperationFailed('WeChat auth failed');
+                }
+                break;
+        }
+        return $this->responseSuccess();
+    }
 }
