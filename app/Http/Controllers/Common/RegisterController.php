@@ -70,7 +70,7 @@ class RegisterController extends Controller{
     public function getWeChatUserInfo($step,Request $request){
         switch ($step){
             case 1:
-                WeChatService::getCode();
+                return WeChatService::getCode();
                 break;
             case 2:
                 $res = WeChatService::callback($request);
