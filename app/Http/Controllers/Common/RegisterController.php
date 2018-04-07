@@ -31,7 +31,7 @@ class RegisterController extends Controller{
         $res = SmsService::getCode($phone);
         //成功返回true，报错返回数组
         if (is_bool($res)){
-            Log::info('send code to'.$phone.'successfully');
+            Log::info('send code to '.$phone.' successfully');
             return $this->responseSuccess();
         }
         else{
@@ -86,7 +86,7 @@ class RegisterController extends Controller{
                     Log::error($res['errmsg']);
                     return $this->responseOperationFailed($res['errmsg']);
                 }
-                return $this->responseSuccess();
+                return $this->responseSuccess($res);
                 break;
         }
     }

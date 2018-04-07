@@ -13,6 +13,9 @@ use App\Model\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+use Tymon\JWTAuth\JWT;
 
 class WeChatService{
     use ApiRequest;
@@ -60,17 +63,20 @@ class WeChatService{
         } else {
             $sex = '未知';
         }
-        UserModel::create([
+        $user = UserModel::create([
+            'phone' => Session::get('phone'),
+            'password' => Hash::make(Session::get('password'))
+        ]);
+        $token = JWTAuth::fromUser($user);
+        $user->update([
             'openid' => $openid,
             'nickname' => $userInfo['nickname'],
             'sex' => $sex,
             'city' => $userInfo['city'],
             'province' => $userInfo['province'],
             'country' => $userInfo['country'],
-            'avatar' => $userInfo['headimgurl'],
-            'phone' => Session::get('phone'),
-            'password' => Hash::make(Session::get('password'))
-        ]);
-        return true;
+            'avatar' => $userInfo['headimgurl']
+            ]);
+        return $token;
     }
 }

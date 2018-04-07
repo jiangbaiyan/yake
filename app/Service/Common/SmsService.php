@@ -10,6 +10,7 @@ namespace App\Service\Common;
 use Flc\Dysms\Client;
 use Flc\Dysms\Request\SendSms;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class SmsService{
 
@@ -53,6 +54,7 @@ class SmsService{
      */
     public static function verifyCode($phone,$frontCode){
         $backCode = Cache::get($phone.'Code');
+        Log::info('用户'.$phone.'后台保存的验证码为'.$backCode.' 前端传递的验证码为'.$frontCode);
         if (!$backCode){
             return false;
         }
