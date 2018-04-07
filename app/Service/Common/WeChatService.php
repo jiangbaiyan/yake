@@ -32,7 +32,7 @@ class WeChatService{
         $appid = self::$appId;
         $redirectUrl = urlencode(self::$baseUrl . '2');
         $requestUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&#wechat_redirect";
-        return redirect($requestUrl);
+        return $requestUrl;
     }
 
     /**

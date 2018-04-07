@@ -77,7 +77,7 @@ class RegisterController extends Controller{
                 }
                 Session::put('phone',$request->phone);
                 Session::put('password',$request->password);
-                return WeChatService::getCode();
+                $this->responseSuccess(WeChatService::getCode());
                 break;
             case 2://微信回调地址
                 $res = WeChatService::callback($request);
