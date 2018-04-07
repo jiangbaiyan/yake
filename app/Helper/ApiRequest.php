@@ -21,8 +21,8 @@ trait ApiRequest
      * 模拟发送请求（暂时只是简单的请求）
      * @param $requestType
      * @param $url
-     * @param array $params
-     * @return array
+     * @param a rray $params
+     * @return bool|mixed
      */
     public static function sendRequest($requestType, $url, $params = [])
     {
@@ -32,6 +32,6 @@ trait ApiRequest
         } else {
             $result = $client->request($requestType, $url);
         }
-        return json_decode($result,true);
+        return json_decode($result->getBody(),true);
     }
 }
