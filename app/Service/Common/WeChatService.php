@@ -5,13 +5,18 @@
  * Date: 2018/4/5
  * Time: 18:12
  */
+
 namespace App\Service\Common;
 
 use App\Helper\ApiRequest;
+use App\Model\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class WeChatService{
     use ApiRequest;
+
     //大荆口腔公众号基本配置
     private static $appId = 'wx48c158c300c446ec';
     private static $appKey = '3272591ea6a14977714f4d059d43d3ba';
@@ -22,7 +27,7 @@ class WeChatService{
      */
     public static function getCode(){
         $appid = self::$appId;
-        $redirectUrl = urlencode(self::$baseUrl.'2');
+        $redirectUrl = urlencode(self::$baseUrl . '2');
         $requestUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&#wechat_redirect";
         return redirect($requestUrl);
     }
@@ -37,18 +42,35 @@ class WeChatService{
         $appKey = self::$appKey;
         $code = $request->code;
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
-        $res = self::sendRequest('GET',$requestUrl);
-        if (isset($res['errcode'])){
+        $res = self::sendRequest('GET', $requestUrl);
+        if (isset($res['errcode'])) {
             return $res;
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
-        $userInfo = self::sendRequest('GET',$pullUserInfoUrl);
-        if (isset($userInfo['errcode'])){
+        $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
+        if (isset($userInfo['errcode'])) {
             return $userInfo;
         }
-        dd($userInfo);
+        if ($userInfo['sex'] == 1) {
+            $sex = '男';
+        } else if ($userInfo['sex'] == 2) {
+            $sex = '女';
+        } else {
+            $sex = '未知';
+        }
+        UserModel::create([
+            'openid' => $openid,
+            'nickname' => $userInfo['nickname'],
+            'sex' => $sex,
+            'city' => $userInfo['city'],
+            'province' => $userInfo['province'],
+            'country' => $userInfo['country'],
+            'avatar' => $userInfo['headimgurl'],
+            'phone' => Session::get('phone'),
+            'password' => Hash::make(Session::get('password'))
+        ]);
         return true;
     }
 }

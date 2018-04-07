@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v1'],function (){
         //验证验证码
         Route::post('verifyCode','Common\RegisterController@verifyCode');
 
-        Route::get('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
+        //微信授权并拉取用户个人信息，存储至数据库
+        Route::post('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
     });
 });

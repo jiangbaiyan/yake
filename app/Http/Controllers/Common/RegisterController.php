@@ -12,6 +12,7 @@ use App\Service\Common\SmsService;
 use App\Service\Common\WeChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller{
@@ -34,7 +35,7 @@ class RegisterController extends Controller{
             return $this->responseSuccess();
         }
         else{
-            Log::error($res);
+            Log::error($res['Message']);
             return $this->responseOperationFailed($res);
         }
     }
@@ -65,21 +66,28 @@ class RegisterController extends Controller{
      * 微信网页授权并拉取用户个人信息
      * @param $step
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function getWeChatUserInfo($step,Request $request){
         switch ($step){
-            case 1:
+            case 1://初次请求
+                $validator = Validator::make($request->all(),['phone' => 'required','password' => 'required']);
+                if ($validator->fails()){
+                    return $this->responseParamValidateFailed($validator->messages());
+                }
+                Session::put('phone',$request->phone);
+                Session::put('password',$request->password);
                 return WeChatService::getCode();
                 break;
-            case 2:
+            case 2://微信回调地址
                 $res = WeChatService::callback($request);
                 //如果返回的是数组，说明有错误
                 if (is_array($res)){
-                    return $this->responseOperationFailed('WeChat auth failed');
+                    Log::error($res['errmsg']);
+                    return $this->responseOperationFailed($res['errmsg']);
                 }
+                return $this->responseSuccess();
                 break;
         }
-        return $this->responseSuccess();
     }
 }

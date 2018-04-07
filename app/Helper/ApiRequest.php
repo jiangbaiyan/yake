@@ -9,22 +9,19 @@
 namespace App\Helper;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Support\Facades\Response;
 
 trait ApiRequest
 {
-
     use ApiResponse;
 
     /**
-     * 模拟发送请求（暂时只是简单的请求）
+     * 模拟发送请求
      * @param $requestType
      * @param $url
-     * @param a rray $params
+     * @param array $params
      * @return bool|mixed
      */
-    public static function sendRequest($requestType, $url, $params = [])
+    public static function sendRequest($requestType, $url, $params = null)
     {
         $client = new Client();
         if (isset($params)) {
