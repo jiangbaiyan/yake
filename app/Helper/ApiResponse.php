@@ -24,7 +24,7 @@ trait ApiResponse{
 
     public static $CODE_UNAUTHORIZED = '401';//未授权（未登录）
 
-    public static $CODE_OPERATION_FAILED = '402';//操作失败
+    public static $CODE_OPERATE_FAILED = '402';//操作失败
 
     public static $CODE_PERMISSION_DENIED = '403';//无权限
 
@@ -74,8 +74,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseOperationFailed($msg = 'operate failed'){
-        return $this->response($this::$CODE_OPERATION_FAILED,$msg);
+    public function responseOperateFailed($msg = 'operate failed'){
+        return $this->response($this::$CODE_OPERATE_FAILED,$msg);
     }
 
     /**
@@ -83,7 +83,7 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseUnauthorized($msg = 'user unauthorized'){
+    public function responseUnauthorized($msg = 'user unAuthorized'){
         return $this->response($this::$CODE_UNAUTHORIZED,$msg);
     }
 

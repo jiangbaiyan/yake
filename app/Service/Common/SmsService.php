@@ -10,7 +10,8 @@ namespace App\Service\Common;
 use Flc\Dysms\Client;
 use Flc\Dysms\Request\SendSms;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
+use App\Exceptions\OperateFailedException;
+use App\Exceptions\ResourceNotFoundException;
 
 class SmsService{
 
@@ -23,7 +24,7 @@ class SmsService{
     /**
      * 获取验证码
      * @param $phone
-     * @return array|string
+     * @throws OperateFailedException
      */
     public static function getCode($phone){
         $client = new Client(self::$config);
@@ -37,12 +38,9 @@ class SmsService{
         $sendSms->setTemplateParam(compact('code'));
         $res = $client->execute($sendSms);
         $res = json_decode(json_encode($res),true);
-        //发送成功，返回验证码字符串
-        if ($res['Code'] == 'OK'){
-            return true;
-        }//发送失败返回失败信息数组
-        else{
-            return $res;
+        //发送失败，抛出异常
+        if ($res['Code'] != 'OK'){
+            throw new OperateFailedException($res['Message']);
         }
     }
 
@@ -50,14 +48,16 @@ class SmsService{
      * 判断验证码是否正确
      * @param $phone
      * @param $frontCode
-     * @return bool
+     * @throws OperateFailedException
+     * @throws ResourceNotFoundException
      */
     public static function verifyCode($phone,$frontCode){
         $backCode = Cache::get($phone.'Code');
-        Log::info('用户'.$phone.'后台保存的验证码为'.$backCode.' 前端传递的验证码为'.$frontCode);
         if (!$backCode){
-            return false;
+            throw new ResourceNotFoundException('no cache code');
         }
-        return $frontCode == $backCode;
+        if ($frontCode != $backCode){
+            throw new OperateFailedException('wrong code');
+        }
     }
 }

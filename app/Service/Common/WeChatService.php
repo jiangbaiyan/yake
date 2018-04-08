@@ -8,14 +8,13 @@
 
 namespace App\Service\Common;
 
+use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Facades\JWTFactory;
-use Tymon\JWTAuth\JWT;
 
 class WeChatService{
     use ApiRequest;
@@ -39,6 +38,7 @@ class WeChatService{
      * 第二步：通过code换取网页授权access_token与openid，并拉取用户信息
      * @param Request $request
      * @return array|bool
+     * @throws OperateFailedException
      */
     public static function callback(Request $request){
         $appid = self::$appId;
@@ -47,14 +47,14 @@ class WeChatService{
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
-            return $res;
+            throw new OperateFailedException($res['errcode']);
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
-            return $userInfo;
+            throw new OperateFailedException($userInfo['errcode']);
         }
         if ($userInfo['sex'] == 1) {
             $sex = '男';
