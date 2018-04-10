@@ -53,6 +53,7 @@ class WeChatService{
         $openid = $res['openid'];
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
+        dd($userInfo);
         if (isset($userInfo['errcode'])) {
             throw new OperateFailedException($userInfo['errcode']);
         }

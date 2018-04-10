@@ -1,7 +1,7 @@
 <?php
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.6.15 on 2018-04-05 04:43:25.
+ * Generated for Laravel 5.6.15 on 2018-04-10 16:48:22.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -2961,19 +2961,6 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Get a lock instance.
-         *
-         * @param string $name
-         * @param int $seconds
-         * @return \Illuminate\Contracts\Cache\Lock 
-         * @static 
-         */ 
-        public static function lock($name, $seconds = 0)
-        {
-            return \Illuminate\Cache\RedisStore::lock($name, $seconds);
-        }
-        
-        /**
          * Remove all items from the cache.
          *
          * @return bool 
@@ -2981,41 +2968,29 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function flush()
         {
-            return \Illuminate\Cache\RedisStore::flush();
+            return \Illuminate\Cache\FileStore::flush();
         }
         
         /**
-         * Get the Redis connection instance.
+         * Get the Filesystem instance.
          *
-         * @return \Predis\ClientInterface 
+         * @return \Illuminate\Filesystem\Filesystem 
          * @static 
          */ 
-        public static function connection()
+        public static function getFilesystem()
         {
-            return \Illuminate\Cache\RedisStore::connection();
+            return \Illuminate\Cache\FileStore::getFilesystem();
         }
         
         /**
-         * Set the connection name to be used.
+         * Get the working directory of the cache.
          *
-         * @param string $connection
-         * @return void 
+         * @return string 
          * @static 
          */ 
-        public static function setConnection($connection)
+        public static function getDirectory()
         {
-            \Illuminate\Cache\RedisStore::setConnection($connection);
-        }
-        
-        /**
-         * Get the Redis database instance.
-         *
-         * @return \Illuminate\Contracts\Redis\Factory 
-         * @static 
-         */ 
-        public static function getRedis()
-        {
-            return \Illuminate\Cache\RedisStore::getRedis();
+            return \Illuminate\Cache\FileStore::getDirectory();
         }
         
         /**
@@ -3026,19 +3001,7 @@ namespace Illuminate\Support\Facades {
          */ 
         public static function getPrefix()
         {
-            return \Illuminate\Cache\RedisStore::getPrefix();
-        }
-        
-        /**
-         * Set the cache key prefix.
-         *
-         * @param string $prefix
-         * @return void 
-         * @static 
-         */ 
-        public static function setPrefix($prefix)
-        {
-            \Illuminate\Cache\RedisStore::setPrefix($prefix);
+            return \Illuminate\Cache\FileStore::getPrefix();
         }
          
     }
@@ -6819,6 +6782,46 @@ namespace Illuminate\Support\Facades {
         public static function hasMacro($name)
         {
             return \Illuminate\Routing\Redirector::hasMacro($name);
+        }
+         
+    }
+
+    class Redis {
+        
+        /**
+         * Get a Redis connection by name.
+         *
+         * @param string|null $name
+         * @return \Illuminate\Redis\Connections\Connection 
+         * @static 
+         */ 
+        public static function connection($name = null)
+        {
+            return \Illuminate\Redis\RedisManager::connection($name);
+        }
+        
+        /**
+         * Resolve the given connection by name.
+         *
+         * @param string|null $name
+         * @return \Illuminate\Redis\Connections\Connection 
+         * @throws \InvalidArgumentException
+         * @static 
+         */ 
+        public static function resolve($name = null)
+        {
+            return \Illuminate\Redis\RedisManager::resolve($name);
+        }
+        
+        /**
+         * Return all of the created connections.
+         *
+         * @return array 
+         * @static 
+         */ 
+        public static function connections()
+        {
+            return \Illuminate\Redis\RedisManager::connections();
         }
          
     }
@@ -14673,6 +14676,8 @@ namespace  {
     class Queue extends \Illuminate\Support\Facades\Queue {}
 
     class Redirect extends \Illuminate\Support\Facades\Redirect {}
+
+    class Redis extends \Illuminate\Support\Facades\Redis {}
 
     class Request extends \Illuminate\Support\Facades\Request {}
 

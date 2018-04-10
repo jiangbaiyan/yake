@@ -21,6 +21,7 @@ Route::group(['prefix' => 'v1'],function (){
         Route::post('verifyCode','Common\RegisterController@verifyCode');
 
         //微信授权并拉取用户个人信息，存储至数据库
-        Route::post('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
+        Route::any('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
+
     });
 });
