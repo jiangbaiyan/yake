@@ -53,6 +53,10 @@ class WeChatService{
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
+        $user = UserModel::where('openid',$openid)->first();
+        if ($user){
+            throw new OperateFailedException('weChat was registered');
+        }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
