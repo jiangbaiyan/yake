@@ -6849,7 +6849,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Get the current path info for the request.
+         * Get the current path Info for the request.
          *
          * @return string 
          * @static 
@@ -6860,7 +6860,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Get the current decoded path info for the request.
+         * Get the current decoded path Info for the request.
          *
          * @return string 
          * @static 
@@ -7576,7 +7576,7 @@ namespace Illuminate\Support\Facades {
         /**
          * Returns the path being requested relative to the executed script.
          * 
-         * The path info always starts with a /.
+         * The path Info always starts with a /.
          * 
          * Suppose this request is instantiated from /mysite on localhost:
          * 
@@ -7684,7 +7684,7 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
-         * Gets the user info.
+         * Gets the user Info.
          *
          * @return string A user name and, optionally, scheme-specific information about how to gain authorization to access the server
          * @static 

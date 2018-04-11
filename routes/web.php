@@ -23,5 +23,12 @@ Route::group(['prefix' => 'v1'],function (){
         //微信授权并拉取用户个人信息，存储至数据库
         Route::any('getWeChatUserInfo/{step}','Common\RegisterController@getWeChatUserInfo');
 
+        //登录
+        Route::post('login','Common\LoginController@login');
+
+    });
+
+    Route::group(['prefix' => 'admin/info'],function (){
+
     });
 });

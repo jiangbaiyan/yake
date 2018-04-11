@@ -49,14 +49,14 @@ class WeChatService{
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
-            throw new OperateFailedException($res['errcode']);
+            throw new OperateFailedException($res['errmsg']);
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
-            throw new OperateFailedException($userInfo['errcode']);
+            throw new OperateFailedException($userInfo['errmsg']);
         }
         if ($userInfo['sex'] == 1) {
             $sex = '男';
@@ -67,10 +67,7 @@ class WeChatService{
         }
         $user = UserModel::create([
             'phone' => Session::get('phone'),
-            'password' => Hash::make(Session::get('password'))
-        ]);
-        $token = JWTAuth::fromUser($user);
-        $user->update([
+            'password' => Hash::make(Session::get('password')),
             'openid' => $openid,
             'nickname' => $userInfo['nickname'],
             'sex' => $sex,
@@ -78,7 +75,11 @@ class WeChatService{
             'province' => $userInfo['province'],
             'country' => $userInfo['country'],
             'avatar' => $userInfo['headimgurl']
-            ]);
-        return $token;
+        ]);
+        $token = JWTAuth::fromUser($user);
+        if (!$token){
+            throw new OperateFailedException('token set failed');
+        }
+        return $token;//注册成功，相当于成功登陆，返回token
     }
 }

@@ -8,7 +8,7 @@
 
 namespace App\Http\Controllers\Common;
 
-use App\Http\Helper\Controller;
+use App\Helper\Controller;
 use App\Service\Common\SmsService;
 use App\Service\Common\WeChatService;
 use Illuminate\Http\Request;
@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Exceptions\ResourceNotFoundException;
 use App\Exceptions\OperateFailedException;
 
-class RegisterController extends Controller
-{
+class RegisterController extends Controller{
 
     /**
      * 获取短信验证码
@@ -89,12 +88,12 @@ class RegisterController extends Controller
                 break;
             case 2://微信回调地址
                 try {
-                    $res = WeChatService::callback($request);
+                    $token = WeChatService::callback($request);
                 } catch (OperateFailedException $e) {
                     Log::error($e->getMessage());
                     return $this->responseOperateFailed($e->getMessage());
                 }
-                return $this->responseSuccess($res);
+                return $this->responseSuccess(['jwtToken' => $token]);
                 break;
         }
     }
