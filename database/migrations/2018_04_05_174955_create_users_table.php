@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('password')->nullable()->comment('密码');
             $table->string('nickname',50)->nullable()->comment('用户昵称');
             $table->unsignedTinyInteger('age')->nullable()->comment('年龄');
-            $table->string('sex',1)->nullable()->comment('性别');
+            $table->string('sex',5)->nullable()->comment('性别');
             $table->string('province',50)->nullable()->comment('省份');
             $table->string('city',50)->nullable()->comment('城市');
             $table->string('country',50)->nullable()->comment('国家');
