@@ -12,8 +12,10 @@ use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Namshi\JOSE\JWT;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class WeChatService{
@@ -53,7 +55,6 @@ class WeChatService{
         $openid = $res['openid'];
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
-        dd($userInfo);
         if (isset($userInfo['errcode'])) {
             throw new OperateFailedException($userInfo['errcode']);
         }
