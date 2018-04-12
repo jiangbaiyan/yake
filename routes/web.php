@@ -29,6 +29,8 @@ Route::group(['prefix' => 'v1'],function (){
     });
 
     Route::group(['prefix' => 'admin/info'],function (){
-
+        Route::group(['middleware' => 'jwt'],function (){
+            Route::post('send','Admin\Info\InfoController@send');
+        });
     });
 });
