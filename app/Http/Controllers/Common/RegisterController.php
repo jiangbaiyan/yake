@@ -9,8 +9,8 @@
 namespace App\Http\Controllers\Common;
 
 use App\Helper\Controller;
-use App\Service\Common\SmsService;
-use App\Service\Common\WeChatService;
+use App\Service\SmsService;
+use App\Service\WeChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;

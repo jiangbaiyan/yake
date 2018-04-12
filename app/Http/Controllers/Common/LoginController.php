@@ -10,7 +10,7 @@ namespace App\Http\Controllers\Common;
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Helper\Controller;
-use App\Service\Common\LoginService;
+use App\Service\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 

@@ -5,7 +5,7 @@
  * Date: 2018/4/5
  * Time: 18:45
  */
-namespace App\Service\Common;
+namespace App\Service;
 
 use Flc\Dysms\Client;
 use Flc\Dysms\Request\SendSms;
@@ -40,6 +40,7 @@ class SmsService{
         $res = json_decode(json_encode($res),true);
         //发送失败，抛出异常
         if ($res['Code'] != 'OK'){
+            \Log::error('用户'.$phone.'的短信验证码发送失败,错误信息为'.$res['Message']);
             throw new OperateFailedException($res['Message']);
         }
     }

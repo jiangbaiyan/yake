@@ -5,7 +5,7 @@
  * Date: 2018/4/11
  * Time: 14:28
  */
-namespace App\Service\Common;
+namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ResourceNotFoundException;
