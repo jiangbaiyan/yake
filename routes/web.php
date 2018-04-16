@@ -41,6 +41,9 @@ Route::group(['prefix' => 'v1'],function (){
                 //获取某条通知的反馈情况
                 Route::get('infoFeedback/{infoId}','Admin\Info\InfoController@getInfoFeedback');
 
+                //获取通知详情
+                Route::get('infoDetail','Admin\Info\InfoController@getDetail');
+                
             });
         });
     });
