@@ -125,7 +125,7 @@ class WeChatService{
         //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
         $config['data']['first']['value'] = $title;
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-        $res = UserModel::select('openid');
+        $res = UserModel::select('id','openid','phone');
         $limit = explode('&',$limit);
         //如果第一项年龄不是all，说明请求参数限制了年龄条件
         if ($limit[0] != 'all'){

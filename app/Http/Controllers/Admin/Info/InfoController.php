@@ -47,7 +47,7 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAllInfo(){
-        return $this->responseSuccess(InfoModel::all());
+        return $this->responseSuccess(InfoModel::simplePaginate(6));
     }
 
     /**
@@ -69,5 +69,18 @@ class InfoController extends Controller{
             return $this->responseResourceNotFound('feedback data not found');
         }
         return $this->responseSuccess($data);
+    }
+
+    /**
+     * 获取通知详情
+     * @param $infoId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getDetail($infoId){
+        $info = InfoModel::find($infoId);
+        if (!$info){
+            return $this->responseResourceNotFound('info not found');
+        }
+        return $this->responseSuccess($info);
     }
 }
