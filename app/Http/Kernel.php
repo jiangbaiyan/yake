@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\Admin;
 use App\Http\Middleware\JWTMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -60,6 +61,7 @@ class Kernel extends HttpKernel
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'jwt' => JWTMiddleware::class
+        'jwt' => JWTMiddleware::class,
+        'isAdmin' => Admin::class
     ];
 }

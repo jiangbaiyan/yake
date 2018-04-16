@@ -30,7 +30,7 @@ Route::group(['prefix' => 'v1'],function (){
 
     Route::group(['prefix' => 'admin/info'],function (){
         Route::group(['middleware' => 'jwt'],function (){
-            Route::group(['middleware' => 'admin'],function(){
+            Route::group(['middleware' => 'isAdmin'],function(){
 
                 //发送通知
                 Route::post('send','Admin\Info\InfoController@send');
