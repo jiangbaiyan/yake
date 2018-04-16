@@ -30,7 +30,18 @@ Route::group(['prefix' => 'v1'],function (){
 
     Route::group(['prefix' => 'admin/info'],function (){
         Route::group(['middleware' => 'jwt'],function (){
-            Route::post('send','Admin\Info\InfoController@send');
+            Route::group(['middleware' => 'admin'],function(){
+
+                //发送通知
+                Route::post('send','Admin\Info\InfoController@send');
+
+                //获取所有通知
+                Route::get('allInfo','Admin\Info\InfoController@getAllInfo');
+
+                //获取某条通知的反馈情况
+                Route::get('infoFeedback/{infoId}','Admin\Info\InfoController@getInfoFeedback');
+
+            });
         });
     });
 });

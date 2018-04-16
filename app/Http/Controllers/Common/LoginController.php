@@ -35,5 +35,4 @@ class LoginController extends Controller{
         }
         return $this->responseSuccess(['jwtToken' => $token]);
     }
-
 }

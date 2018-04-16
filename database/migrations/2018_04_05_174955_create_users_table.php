@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('city',50)->nullable()->comment('城市');
             $table->string('country',50)->nullable()->comment('国家');
             $table->string('avatar',1000)->nullable()->comment('头像url');
+            $table->tinyInteger('is_admin')->nullable()->default(0)->comment('是否为管理员角色');
             $table->unique('openid');
             $table->unique('phone');
             $table->timestamps();

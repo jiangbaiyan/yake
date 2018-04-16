@@ -10,6 +10,7 @@ namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
+use App\Model\InfoFeedbackModel;
 use App\Model\InfoModel;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
@@ -119,26 +120,37 @@ class WeChatService{
      */
     public static function sendModelInfo($title,$content,$limit){
         $user = Session::get('user');
-        $info = $user->infos()->create(compact('title','content','limit'));
-        if (!$info){
-            throw new OperateFailedException('info created failed');
-        }
+        $limitStr = '全部患者';//这个为要存入数据库的限制条件字符串
         $config = self::$config;
         //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
         $config['data']['first']['value'] = $title;
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
         $res = UserModel::select('openid');
         $limit = explode('&',$limit);
-        if ($limit[0] != '不限'){
+        //如果第一项年龄不是all，说明请求参数限制了年龄条件
+        if ($limit[0] != 'all'){
             $ageLimit = explode(' ',$limit[0]);
+            $limitStr = $ageLimit[0].'~'.$ageLimit[1].'岁';
             $res = $res->whereBetween('age',$ageLimit);
         }
-        if ($limit[1] != '不限'){
+        if ($limit[1] != 'all'){
+            //如果字符串仍为默认值，说明第一个年龄条件是all，直接覆盖默认值，否则在年龄条件后面追加空格+条件
+            if ($limitStr == '全部患者'){
+                $limitStr = $limit[1];
+            }
+            else{
+                $limitStr .= ' '.$limit[1];
+            }
             $res = $res->where('sex',$limit[1]);
         }
         $sendUsers = $res->get();
         if (!$sendUsers){
-            throw new OperateFailedException('no user in this scope');
+            throw new OperateFailedException('no user in this query condition');
+        }
+        $infoData = ['title' => $title,'content' => $content,'limit' => $limitStr];
+        $info = $user->infos()->create($infoData);
+        if (!$info){
+            throw new OperateFailedException('info created failed');
         }
         $access_token = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token";
@@ -148,6 +160,11 @@ class WeChatService{
             if ($res['errmsg'] != 'ok'){
                 \Log::error('用户'.$sendUser->phone.'发送通知失败','错误信息为:'.$res['errmsg']);
                 throw new OperateFailedException($res['errmsg']);
+            }
+            $insertData = ['user_id' => $sendUser->id,'info_id' => $info->id,'status' => 0];
+            $infoFeedback = InfoFeedbackModel::create($insertData);
+            if (!$infoFeedback){
+                throw new OperateFailedException('infoFeedback created failed');
             }
         }
     }
