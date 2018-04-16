@@ -56,6 +56,9 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      */
     public function getInfoFeedback($infoId){
+        if (!$infoId){
+            return $this->responseParamValidateFailed();
+        }
         $info = InfoModel::find($infoId);
         if (!$info){
             return $this->responseResourceNotFound('info not found');
@@ -77,6 +80,9 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      */
     public function getDetail($infoId){
+        if (!$infoId){
+            return $this->responseParamValidateFailed();
+        }
         $info = InfoModel::find($infoId);
         if (!$info){
             return $this->responseResourceNotFound('info not found');
