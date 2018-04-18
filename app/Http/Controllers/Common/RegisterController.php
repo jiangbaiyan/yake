@@ -8,11 +8,11 @@
 
 namespace App\Http\Controllers\Common;
 
+use App\Exceptions\ParamValidateFailedException;
 use App\Helper\Controller;
 use App\Service\SmsService;
 use App\Service\WeChatService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Exceptions\ResourceNotFoundException;
@@ -24,21 +24,17 @@ class RegisterController extends Controller{
      * 获取短信验证码
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
      */
     public function getCode(Request $request)
     {
         $validator = Validator::make($request->all(), ['phone' => 'required|unique:users']);
         if ($validator->fails()) {
-            return $this->responseParamValidateFailed($validator->messages());
+            throw new ParamValidateFailedException($validator->messages());
         }
         $phone = $request->phone;
-        try {
-            SmsService::getCode($phone);
-        } catch (OperateFailedException $e) {
-            Log::error($e->getMessage());
-            return $this->responseOperateFailed($e->getMessage());
-        }
-        Log::info('send code to ' . $phone . ' successfully');
+        SmsService::getCode($phone);
         return $this->responseSuccess();
     }
 
@@ -46,25 +42,19 @@ class RegisterController extends Controller{
      * 验证验证码是否正确
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
+     * @throws ResourceNotFoundException
      */
     public function verifyCode(Request $request)
     {
         $validator = Validator::make($request->all(), ['phone' => 'required|unique:users', 'code' => 'required']);
         if ($validator->fails()) {
-            return $this->responseParamValidateFailed($validator->messages());
+            throw new ParamValidateFailedException($validator->messages());
         }
         $phone = $request->phone;
         $code = $request->code;
-        try{
-            SmsService::verifyCode($phone,$code);
-        }catch (ResourceNotFoundException $e){
-            Log::info('用户' . $phone . '短信验证失败'.'错误信息为'.$e->getMessage());
-            return $this->responseResourceNotFound($e->getMessage());
-        }catch (OperateFailedException $e){
-            Log::info('用户' . $phone . '短信验证失败'.'错误信息为'.$e->getMessage());
-            return $this->responseOperateFailed($e->getMessage());
-        }
-        Log::info('用户' . $phone . '短信验证成功');
+        SmsService::verifyCode($phone,$code);
         return $this->responseSuccess();
     }
 
@@ -73,6 +63,8 @@ class RegisterController extends Controller{
      * @param $step
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws OperateFailedException
+     * @throws ParamValidateFailedException
      */
     public function getWeChatUserInfo($step, Request $request)
     {
@@ -80,19 +72,14 @@ class RegisterController extends Controller{
             case 1://初次请求
                 $validator = Validator::make($request->all(), ['phone' => 'required', 'password' => 'required']);
                 if ($validator->fails()) {
-                    return $this->responseParamValidateFailed($validator->messages());
+                    throw new ParamValidateFailedException($validator->messages());
                 }
                 Session::put('phone', $request->phone);
                 Session::put('password', $request->password);
                 return $this->responseSuccess(WeChatService::getCode());
                 break;
             case 2://微信回调地址
-                try {
-                    $token = WeChatService::callback($request);
-                } catch (OperateFailedException $e) {
-                    Log::error($e->getMessage());
-                    return $this->responseOperateFailed($e->getMessage());
-                }
+                $token = WeChatService::callback($request);
                 return $this->responseSuccess(['jwtToken' => $token]);
                 break;
         }

@@ -8,11 +8,12 @@
 namespace App\Http\Controllers\Admin\Info;
 
 use App\Exceptions\OperateFailedException;
+use App\Exceptions\ParamValidateFailedException;
+use App\Exceptions\ResourceNotFoundException;
 use App\Helper\Controller;
 use App\Model\InfoModel;
 use App\Service\WeChatService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 class InfoController extends Controller{
@@ -21,6 +22,8 @@ class InfoController extends Controller{
      * 发送通知
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws ParamValidateFailedException
+     * @throws OperateFailedException
      */
     public function send(Request $request){
         $validator = Validator::make($request->all(),[
@@ -29,16 +32,12 @@ class InfoController extends Controller{
             'limit' => 'required',
         ]);
         if($validator->fails()){
-            return $this->responseParamValidateFailed($validator->messages());
+            throw new ParamValidateFailedException($validator->messages());
         }
         $limit = $request->input('limit','all&all');
         $title = $request->input('title');
         $content = $request->input('content');
-        try {
-            WeChatService::sendModelInfo($title, $content, $limit);
-        } catch (OperateFailedException $e) {
-            return $this->responseOperateFailed($e->getMessage());
-        }
+        WeChatService::sendModelInfo($title, $content, $limit);
         return $this->responseSuccess();
     }
 
@@ -54,14 +53,16 @@ class InfoController extends Controller{
      * 获取通知反馈情况
      * @param $infoId
      * @return \Illuminate\Http\JsonResponse
+     * @throws ParamValidateFailedException
+     * @throws ResourceNotFoundException
      */
     public function getInfoFeedback($infoId){
         if (!$infoId){
-            return $this->responseParamValidateFailed();
+            throw new ParamValidateFailedException('need infoId');
         }
         $info = InfoModel::find($infoId);
         if (!$info){
-            return $this->responseResourceNotFound('info not found');
+            throw new ResourceNotFoundException('info not found');
         }
         $data = $info->infoFeedbacks()
             ->join('users','users.id','=','info_feedbacks.user_id')
@@ -69,7 +70,7 @@ class InfoController extends Controller{
             ->select('info_feedbacks.status','users.nickname','users.phone','infos.title')
             ->get();
         if (!$data){
-            return $this->responseResourceNotFound('feedback data not found');
+            throw new ResourceNotFoundException('feedback data not found');
         }
         return $this->responseSuccess($data);
     }
@@ -78,14 +79,16 @@ class InfoController extends Controller{
      * 获取通知详情
      * @param $infoId
      * @return \Illuminate\Http\JsonResponse
+     * @throws ParamValidateFailedException
+     * @throws ResourceNotFoundException
      */
     public function getDetail($infoId){
         if (!$infoId){
-            return $this->responseParamValidateFailed();
+            throw new ParamValidateFailedException('need infoId');
         }
         $info = InfoModel::find($infoId);
         if (!$info){
-            return $this->responseResourceNotFound('info not found');
+            throw new ResourceNotFoundException('info not found');
         }
         return $this->responseSuccess($info);
     }

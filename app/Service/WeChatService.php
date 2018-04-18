@@ -71,17 +71,19 @@ class WeChatService{
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
+            \Log::error('WeChat auth failed,message:'.$res['errmsg']);
             throw new OperateFailedException($res['errmsg']);
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
         $user = UserModel::where('openid',$openid)->first();
         if ($user){
-            throw new OperateFailedException('weChat was registered');
+            throw new OperateFailedException('WeChat was registered');
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
+            \Log::error('WeChat auth failed,message:'.$res['errmsg']);
             throw new OperateFailedException($userInfo['errmsg']);
         }
         if ($userInfo['sex'] == 1) {

@@ -10,10 +10,9 @@ namespace App\Exceptions;
 use App\Helper\ApiResponse;
 
 class OperateFailedException extends \Exception{
-    use ApiResponse;
 
-    public function __construct($message = "operate failed")
+    public function __construct($message = '')
     {
-        parent::__construct($message, self::$CODE_OPERATE_FAILED);
+        parent::__construct($message ? $message : ApiResponse::$operateFailedStr, ApiResponse::$CODE_OPERATE_FAILED);
     }
 }

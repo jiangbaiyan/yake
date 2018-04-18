@@ -10,10 +10,8 @@ namespace App\Exceptions;
 use App\Helper\ApiResponse;
 
 class ResourceNotFoundException extends \Exception{
-    use ApiResponse;
-
-    public function __construct($message = "resource not found")
+    public function __construct($message = '')
     {
-        parent::__construct($message,self::$CODE_NOT_FOUND);
+        parent::__construct($message ? $message :ApiResponse::$resourceNotFoundStr,ApiResponse::$CODE_NOT_FOUND);
     }
 }

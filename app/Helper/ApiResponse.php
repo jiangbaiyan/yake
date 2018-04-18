@@ -19,7 +19,7 @@ trait ApiResponse{
     /**
      * @var string 失败状态码
      */
-    public static $CODE_PARAM_MISSED = '400';//参数缺失
+    public static $CODE_PARAM_ERROR = '400';//参数错误
 
     public static $CODE_UNAUTHORIZED = '401';//未授权（未登录）
 
@@ -30,7 +30,22 @@ trait ApiResponse{
     public static $CODE_NOT_FOUND = '404';//资源未找到
 
     /**
-     * 通用基础
+     * @var string 提示信息
+     */
+    public static $successStr = 'success';
+
+    public static $operateFailedStr = 'operate failed';
+
+    public static $resourceNotFoundStr = 'resource not found';
+
+    public static $paramErrorStr = 'missing or wrong parameters';
+
+    public static $unauthorizedStr = 'user unauthorized';
+
+    public static $permissionDeniedStr = 'permission denied';
+
+    /**
+     * 通用基础返回
      * @param $status
      * @param string $msg
      * @param array $data
@@ -46,8 +61,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseSuccess($data = [],$msg = 'success'){
-        return $this->response($this::$CODE_SUCCESS,$msg,$data);
+    public function responseSuccess($data = [],$msg = ''){
+        return $this->response($this::$CODE_SUCCESS,$msg ? $msg :self::$successStr,$data);
     }
 
     /**
@@ -55,8 +70,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseResourceNotFound($msg = 'resource not found'){
-        return $this->response($this::$CODE_NOT_FOUND,$msg);
+    public function responseResourceNotFound($msg = ''){
+        return $this->response($this::$CODE_NOT_FOUND,$msg ? $msg : self::$resourceNotFoundStr);
     }
 
     /**
@@ -64,8 +79,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseParamValidateFailed($msg = 'missing or wrong parameters'){
-        return $this->response($this::$CODE_PARAM_MISSED,$msg);
+    public function responseParamValidateFailed($msg = ''){
+        return $this->response($this::$CODE_PARAM_ERROR,$msg ? $msg :self::$paramErrorStr);
     }
 
     /**
@@ -73,8 +88,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseOperateFailed($msg = 'operate failed'){
-        return $this->response($this::$CODE_OPERATE_FAILED,$msg);
+    public function responseOperateFailed($msg = ''){
+        return $this->response($this::$CODE_OPERATE_FAILED,$msg ? $msg :self::$operateFailedStr);
     }
 
     /**
@@ -82,8 +97,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responseUnauthorized($msg = 'user unAuthorized'){
-        return $this->response($this::$CODE_UNAUTHORIZED,$msg);
+    public function responseUnauthorized($msg = ''){
+        return $this->response($this::$CODE_UNAUTHORIZED,$msg ? $msg :self::$unauthorizedStr);
     }
 
     /**
@@ -91,8 +106,8 @@ trait ApiResponse{
      * @param string $msg
      * @return \Illuminate\Http\JsonResponse
      */
-    public function responsePermissionDenied($msg = 'permission denied'){
-        return $this->response($this::$CODE_PERMISSION_DENIED,$msg);
+    public function responsePermissionDenied($msg = ''){
+        return $this->response($this::$CODE_PERMISSION_DENIED,$msg ? $msg :self::$permissionDeniedStr);
     }
 
 }
