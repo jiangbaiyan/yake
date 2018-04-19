@@ -10,7 +10,9 @@ namespace App\Service;
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Model\UserModel;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginService{
@@ -28,13 +30,13 @@ class LoginService{
         if (!$user){
             throw new ResourceNotFoundException('user not found');
         }
-        if (!Hash::check($password,$user->password)){
+        if (!$token = Auth::attempt(['phone' => $phone,'password' => $password])){
             throw new OperateFailedException('wrong password');
         }
-        $token = JWTAuth::fromUser($user);
         if (!$token){
             throw new OperateFailedException('token set failed');
         }
+        Session::put('user',$user);
         return $token;
     }
 }

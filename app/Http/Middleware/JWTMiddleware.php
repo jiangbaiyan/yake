@@ -4,12 +4,11 @@ namespace App\Http\Middleware;
 
 use App\Helper\ApiResponse;
 use Closure;
-use Illuminate\Support\Facades\Session;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Http\Middleware\BaseMiddleware;
 
-class JWTMiddleware
+class JWTMiddleware extends BaseMiddleware
 {
     use ApiResponse;
     /**
@@ -23,14 +22,15 @@ class JWTMiddleware
     {
         //JWT验证
         try{
-            if (!$user = JWTAuth::parseToken()->authenticate()){
+            $this->checkForToken($request);
+            if (!JWTAuth::parseToken()->authenticate()){
                 return $this->responseUnauthorized();
             };
-        }catch (\Exception $e){
+        }catch (UnauthorizedHttpException $e){
+            return $this->responseUnauthorized($e->getMessage());
+        } catch (\Exception $e){
             return $this->responseUnauthorized($e->getMessage());
         }
-        //通过认证，存入session
-        Session::put('user',$user);
         return $next($request);
     }
 }
