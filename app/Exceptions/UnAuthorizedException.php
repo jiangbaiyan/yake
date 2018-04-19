@@ -10,7 +10,7 @@ namespace App\Exceptions;
 use App\Helper\ApiResponse;
 
 class UnAuthorizedException extends \Exception{
-    public function __construct($message = '', $code)
+    public function __construct($message = '')
     {
         parent::__construct($message ? $message : ApiResponse::$unauthorizedStr, ApiResponse::$CODE_UNAUTHORIZED);
     }

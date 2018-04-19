@@ -75,21 +75,4 @@ class InfoController extends Controller{
         return $this->responseSuccess($data);
     }
 
-    /**
-     * 获取通知详情
-     * @param $infoId
-     * @return \Illuminate\Http\JsonResponse
-     * @throws ParamValidateFailedException
-     * @throws ResourceNotFoundException
-     */
-    public function getDetail($infoId){
-        if (!$infoId){
-            throw new ParamValidateFailedException('need infoId');
-        }
-        $info = InfoModel::find($infoId);
-        if (!$info){
-            throw new ResourceNotFoundException('info not found');
-        }
-        return $this->responseSuccess($info);
-    }
 }

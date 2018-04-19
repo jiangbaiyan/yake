@@ -120,9 +120,10 @@ class WeChatService{
      * @param $content
      * @param $limit
      * @throws OperateFailedException
+     * @throws \App\Exceptions\UnAuthorizedException
      */
     public static function sendModelInfo($title,$content,$limit){
-        $user = Session::get('user');
+        $user = UserModel::getCurUser();
         $limitStr = '全部患者';//这个为要存入数据库的限制条件字符串
         $config = self::$config;
         //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
@@ -178,8 +179,8 @@ class WeChatService{
      * @throws OperateFailedException
      */
     public static function getAccessToken(){
-        if (Cache::has('access_token')){
-            $access_token = Cache::get('access_token');
+        if (Cache::has('accessToken')){
+            $accessToken = Cache::get('accessToken');
         }
         else{
             $appid = self::$appId;
@@ -190,9 +191,9 @@ class WeChatService{
                 \Log::error($res['errmsg']);
                 throw new OperateFailedException($res['errmsg']);
             }
-            $access_token = $res['access_token'];
-            Cache::put('access_token',$access_token,119);
+            $accessToken = $res['access_token'];
+            Cache::put('accessToken',$accessToken,119);
         }
-        return $access_token;
+        return $accessToken;
     }
 }

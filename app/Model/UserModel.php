@@ -2,6 +2,7 @@
 
 namespace App\Model;
 
+use App\Exceptions\UnAuthorizedException;
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,6 +31,18 @@ class UserModel extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    /**
+     * 获取当前登录用户
+     * @return mixed
+     * @throws UnAuthorizedException
+     */
+    public static function getCurUser(){
+        if (!\Session::has('user')){
+            throw new UnAuthorizedException();
+        }
+        return \Session::get('user');
     }
 
     public function infos(){
