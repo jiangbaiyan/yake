@@ -26,7 +26,7 @@ class JWTMiddleware extends BaseMiddleware
             if (!JWTAuth::parseToken()->authenticate()){
                 return $this->responseUnauthorized();
             };
-        }catch (UnauthorizedHttpException $e){
+        } catch (UnauthorizedHttpException $e){
             return $this->responseUnauthorized($e->getMessage());
         } catch (\Exception $e){
             return $this->responseUnauthorized($e->getMessage());

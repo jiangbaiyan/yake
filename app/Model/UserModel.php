@@ -39,10 +39,10 @@ class UserModel extends Authenticatable implements JWTSubject
      * @throws UnAuthorizedException
      */
     public static function getCurUser(){
-        if (!\Session::has('user')){
+        if (!$user = \Auth::user()){
             throw new UnAuthorizedException();
         }
-        return \Session::get('user');
+        return $user;
     }
 
     public function infos(){

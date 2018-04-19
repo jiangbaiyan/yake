@@ -11,7 +11,6 @@ namespace App\Service;
 use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
 use App\Model\InfoFeedbackModel;
-use App\Model\InfoModel;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -108,7 +107,6 @@ class WeChatService{
         if (!$token){
             throw new OperateFailedException('token set failed');
         }
-        Session::put('user',$user);
         return $token;//注册成功，相当于成功登陆，返回token
     }
 

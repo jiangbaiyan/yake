@@ -14,7 +14,6 @@ use App\Helper\Controller;
 use App\Model\InfoFeedbackModel;
 use App\Model\InfoModel;
 use App\Model\UserModel;
-use Illuminate\Support\Facades\Session;
 
 class InfoController extends Controller{
 

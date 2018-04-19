@@ -11,9 +11,6 @@ use App\Exceptions\OperateFailedException;
 use App\Exceptions\ResourceNotFoundException;
 use App\Model\UserModel;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginService{
 
@@ -36,7 +33,6 @@ class LoginService{
         if (!$token){
             throw new OperateFailedException('token set failed');
         }
-        Session::put('user',$user);
         return $token;
     }
 }
