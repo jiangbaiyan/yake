@@ -157,7 +157,6 @@ class WeChatService
         }
         \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers) {
             $fileUrl = implode(',', FileHelper::saveFile($file));
-            dd($fileUrl);
             $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr, 'url' => $fileUrl];
             $info = $user->infos()->create($infoData);
             if (!$info) {
