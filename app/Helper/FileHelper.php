@@ -27,10 +27,10 @@ class FileHelper{
         self::isAllowedFormat($file);
         if (is_array($file)){
             foreach ($file as $fileItem){
-                $path[] = self::$upyunUrl.Storage::putFileAs('yake/'.date('Y').'/'.date('md'),$fileItem,$fileItem->getClientOriginalName(),'public');
+                $path[] = self::$upyunUrl.Storage::disk('upyun')->putFileAs('yake/'.date('Y').'/'.date('md'),$fileItem,$fileItem->getClientOriginalName(),'public');
             }
         }else{
-            $path[] = self::$upyunUrl.Storage::putFileAs('yake/'.date('Y').'/'.date('md'),$file,$file->getClientOriginalName(),'public');
+            $path[] = self::$upyunUrl.Storage::disk('upyun')->putFileAs('yake/'.date('Y').'/'.date('md'),$file,$file->getClientOriginalName(),'public');
         }
         if(!$path){
             throw new OperateFailedException('file upload failed');
