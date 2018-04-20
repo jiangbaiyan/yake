@@ -37,6 +37,7 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      * @throws ParamValidateFailedException
      * @throws ResourceNotFoundException
+     * @throws \App\Exceptions\UnAuthorizedException
      */
     public function getDetail($infoId){
         if (!$infoId){
@@ -46,6 +47,9 @@ class InfoController extends Controller{
         if (!$info){
             throw new ResourceNotFoundException('info not found');
         }
+        $infoFeedback = InfoFeedbackModel::where(['user_id' => UserModel::getCurUser()->id,'info_id' => $info->id])->first();
+        $infoFeedback->status = 1;
+        $infoFeedback->save();
         return $this->responseSuccess($info);
     }
 }
