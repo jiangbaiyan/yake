@@ -145,11 +145,6 @@ class WeChatService
         }
         if ($limit[1] != 'all') {
             //如果字符串仍为默认值，说明第一个年龄条件是all，直接覆盖默认值，否则在年龄条件后面追加空格+条件
-            if ($limitStr == ConstHelper::ALL) {
-                $limitStr = $limit[1];
-            } else {
-                $limitStr .= ' ' . $limit[1];
-            }
             switch ($limit[1]){
                 case 'female':
                     $sex = ConstHelper::FEMALE;
@@ -160,6 +155,11 @@ class WeChatService
                 default:
                     $sex = ConstHelper::UNKNOWN;
                     break;
+            }
+            if ($limitStr == ConstHelper::ALL) {
+                $limitStr = $sex;
+            } else {
+                $limitStr .= ' ' . $sex;
             }
             $res = $res->where('sex', $sex);
         }
