@@ -155,7 +155,7 @@ class WeChatService
         if (!$sendUsers) {
             throw new OperateFailedException('no user in this query condition');
         }
-        \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers) {
+        \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers,$config) {
             $fileUrl = implode(',', FileHelper::saveFile($file));
             $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr, 'url' => $fileUrl];
             $info = $user->infos()->create($infoData);
