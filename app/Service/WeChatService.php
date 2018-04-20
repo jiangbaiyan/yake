@@ -10,6 +10,7 @@ namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
+use App\Helper\ConstHelper;
 use App\Helper\FileHelper;
 use App\Model\InfoFeedbackModel;
 use App\Model\UserModel;
@@ -129,7 +130,7 @@ class WeChatService
     public static function sendModelInfo($title, $content, $limit, $file = [])
     {
         $user = UserModel::getCurUser();
-        $limitStr = '全部患者';//这个为要存入数据库的限制条件字符串
+        $limitStr = ConstHelper::ALL;//这个为要存入数据库的限制条件字符串
         $config = self::$config;
         //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
         $config['data']['first']['value'] = $title;
@@ -144,12 +145,23 @@ class WeChatService
         }
         if ($limit[1] != 'all') {
             //如果字符串仍为默认值，说明第一个年龄条件是all，直接覆盖默认值，否则在年龄条件后面追加空格+条件
-            if ($limitStr == '全部患者') {
+            if ($limitStr == ConstHelper::ALL) {
                 $limitStr = $limit[1];
             } else {
                 $limitStr .= ' ' . $limit[1];
             }
-            $res = $res->where('sex', $limit[1]);
+            switch ($limit[1]){
+                case 'female':
+                    $sex = ConstHelper::FEMALE;
+                    break;
+                case 'male':
+                    $sex = ConstHelper::MALE;
+                    break;
+                default:
+                    $sex = ConstHelper::UNKNOWN;
+                    break;
+            }
+            $res = $res->where('sex', $sex);
         }
         $sendUsers = $res->get();
         if (!$sendUsers) {
