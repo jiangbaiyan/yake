@@ -25,6 +25,7 @@ class InfoController extends Controller{
      * @throws OperateFailedException
      * @throws ParamValidateFailedException
      * @throws \App\Exceptions\UnAuthorizedException
+     * @throws \Throwable
      */
     public function send(Request $request){
         $validator = Validator::make($request->all(),[

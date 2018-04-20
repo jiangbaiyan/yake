@@ -74,7 +74,7 @@ class WeChatService
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
-            \Log::error('WeChat auth failed,message:' . $res['errmsg']);
+            \Log::error($res['errmsg']);
             throw new OperateFailedException($res['errmsg']);
         }
         $accessToken = $res['access_token'];
@@ -86,7 +86,7 @@ class WeChatService
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
-            \Log::error('WeChat auth failed,message:' . $res['errmsg']);
+            \Log::error($res['errmsg']);
             throw new OperateFailedException($userInfo['errmsg']);
         }
         if ($userInfo['sex'] == 1) {
@@ -157,6 +157,7 @@ class WeChatService
         }
         \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers) {
             $fileUrl = implode(',', FileHelper::saveFile($file));
+            dd($fileUrl);
             $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr, 'url' => $fileUrl];
             $info = $user->infos()->create($infoData);
             if (!$info) {
@@ -168,7 +169,7 @@ class WeChatService
                 $config['touser'] = $sendUser->openid;
                 $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
                 if ($res['errmsg'] != 'ok') {
-                    \Log::error('用户' . $sendUser->phone . '发送通知失败', '错误信息为:' . $res['errmsg']);
+                    \Log::error($res['errmsg']);
                     throw new OperateFailedException($res['errmsg']);
                 }
                 $insertData = ['user_id' => $sendUser->id, 'info_id' => $info->id, 'status' => 0];
