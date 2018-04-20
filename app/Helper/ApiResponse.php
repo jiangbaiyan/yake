@@ -25,7 +25,7 @@ trait ApiResponse{
 
     public static $CODE_OPERATE_FAILED = '402';//操作失败
 
-    public static $CODE_PERMISSION_DENIED = '403';//无权限
+    public static $CODE_PERMISSION_DENIED = '403';//无权限(已登录)
 
     public static $CODE_NOT_FOUND = '404';//资源未找到
 
@@ -34,15 +34,15 @@ trait ApiResponse{
      */
     public static $successStr = 'success';
 
-    public static $operateFailedStr = 'operate failed';
+    public static $operateFailedStr = '操作失败';
 
-    public static $resourceNotFoundStr = 'resource not found';
+    public static $resourceNotFoundStr = '请求资源未找到';
 
-    public static $paramErrorStr = 'missing or wrong parameters';
+    public static $paramErrorStr = '参数缺失或参数错误';
 
-    public static $unauthorizedStr = 'user unauthorized';
+    public static $unauthorizedStr = '用户未授权';
 
-    public static $permissionDeniedStr = 'permission denied';
+    public static $permissionDeniedStr = '用户没有该操作的权限';
 
     /**
      * 通用基础返回

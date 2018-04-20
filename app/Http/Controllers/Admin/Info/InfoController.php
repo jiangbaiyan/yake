@@ -10,6 +10,7 @@ namespace App\Http\Controllers\Admin\Info;
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ParamValidateFailedException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Helper\ConstHelper;
 use App\Helper\Controller;
 use App\Model\InfoModel;
 use App\Service\WeChatService;
@@ -39,7 +40,7 @@ class InfoController extends Controller{
         $limit = $request->input('limit','all&all');
         $title = $request->input('title');
         $content = $request->input('content');
-        WeChatService::sendModelInfo($title, $content, $limit,$request->has('file') ? $request->file('file'):[]);
+        WeChatService::sendModelInfo($title, $content, $limit,$request->has('file') ? $request->file('file'):false);
         return $this->responseSuccess();
     }
 
@@ -60,11 +61,11 @@ class InfoController extends Controller{
      */
     public function getInfoFeedback($infoId){
         if (!$infoId){
-            throw new ParamValidateFailedException('need infoId');
+            throw new ParamValidateFailedException();
         }
         $info = InfoModel::find($infoId);
         if (!$info){
-            throw new ResourceNotFoundException('info not found');
+            throw new ResourceNotFoundException(ConstHelper::INFO);
         }
         $data = $info->infoFeedbacks()
             ->join('users','users.id','=','info_feedbacks.user_id')
@@ -72,7 +73,7 @@ class InfoController extends Controller{
             ->select('info_feedbacks.status','users.nickname','users.phone','infos.title')
             ->get();
         if (!$data){
-            throw new ResourceNotFoundException('feedback data not found');
+            throw new ResourceNotFoundException(ConstHelper::NO_QUERY_RESULT);
         }
         return $this->responseSuccess($data);
     }

@@ -7,6 +7,7 @@
  */
 namespace App\Service;
 
+use App\Helper\ConstHelper;
 use Flc\Dysms\Client;
 use Flc\Dysms\Request\SendSms;
 use Illuminate\Support\Facades\Cache;
@@ -40,8 +41,8 @@ class SmsService{
         $res = json_decode(json_encode($res),true);
         //发送失败，抛出异常
         if ($res['Code'] != 'OK'){
-            \Log::error('用户'.$phone.'的短信验证码发送失败,错误信息为'.$res['Message']);
-            throw new OperateFailedException($res['Message']);
+            \Log::error($res['Message']);
+            throw new OperateFailedException(ConstHelper::SMS_ERROR);
         }
     }
 
@@ -55,10 +56,10 @@ class SmsService{
     public static function verifyCode($phone,$frontCode){
         $backCode = Cache::get($phone.'Code');
         if (!$backCode){
-            throw new ResourceNotFoundException('no cache code');
+            throw new ResourceNotFoundException(ConstHelper::CODE);
         }
         if ($frontCode != $backCode){
-            throw new OperateFailedException('wrong code');
+            throw new OperateFailedException(ConstHelper::WRONG_CODE);
         }
     }
 }

@@ -76,19 +76,19 @@ class WeChatService
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
             \Log::error($res['errmsg']);
-            throw new OperateFailedException($res['errmsg']);
+            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
-            throw new OperateFailedException('WeChat was registered');
+            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
             \Log::error($res['errmsg']);
-            throw new OperateFailedException($userInfo['errmsg']);
+            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
         }
         if ($userInfo['sex'] == 1) {
             $sex = '男';
@@ -110,7 +110,7 @@ class WeChatService
         ]);
         $token = JWTAuth::fromUser($user);
         if (!$token) {
-            throw new OperateFailedException('token set failed');
+            throw new OperateFailedException(ConstHelper::TOKEN_SET_FAILED);
         }
         return $token;//注册成功，相当于成功登陆，返回token
     }
@@ -127,7 +127,7 @@ class WeChatService
      * @throws \App\Exceptions\UnAuthorizedException
      * @throws \Throwable
      */
-    public static function sendModelInfo($title, $content, $limit, $file = [])
+    public static function sendModelInfo($title, $content, $limit, $file)
     {
         $user = UserModel::getCurUser();
         $limitStr = ConstHelper::ALL;//这个为要存入数据库的限制条件字符串
@@ -165,14 +165,17 @@ class WeChatService
         }
         $sendUsers = $res->get();
         if (!$sendUsers) {
-            throw new OperateFailedException('no user in this query condition');
+            throw new OperateFailedException(ConstHelper::NO_QUERY_RESULT);
         }
-        \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers,$config) {
-            $fileUrl = implode(',', FileHelper::saveFile($file));
-            $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr, 'url' => $fileUrl];
+        $infoData = ['title' => $title,'content' => $content,'limit' => $limitStr];
+        \DB::transaction(function () use ($infoData, $file, $user, $sendUsers, $config) {
+            if ($file){
+                $filePath = implode(',', FileHelper::saveFile($file));
+                $infoData['url'] = $filePath;
+            }
             $info = $user->infos()->create($infoData);
             if (!$info) {
-                throw new OperateFailedException('info created failed');
+                throw new OperateFailedException();
             }
             $accessToken = self::getAccessToken();
             $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
@@ -181,12 +184,12 @@ class WeChatService
                 $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
                 if ($res['errmsg'] != 'ok') {
                     \Log::error($res['errmsg']);
-                    throw new OperateFailedException($res['errmsg']);
+                    throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
                 }
                 $insertData = ['user_id' => $sendUser->id, 'info_id' => $info->id, 'status' => 0];
                 $infoFeedback = InfoFeedbackModel::create($insertData);
                 if (!$infoFeedback) {
-                    throw new OperateFailedException('infoFeedback created failed');
+                    throw new OperateFailedException();
                 }
             }
         });
@@ -208,7 +211,7 @@ class WeChatService
             $res = self::sendRequest('GET', $url);
             if (!isset($res['access_token'])) {
                 \Log::error($res['errmsg']);
-                throw new OperateFailedException($res['errmsg']);
+                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
             }
             $accessToken = $res['access_token'];
             Cache::put('accessToken', $accessToken, 119);

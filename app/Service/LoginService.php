@@ -9,6 +9,7 @@ namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Helper\ConstHelper;
 use App\Model\UserModel;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,13 +26,13 @@ class LoginService{
     public static function login($phone,$password){
         $user = UserModel::where('phone',$phone)->first();
         if (!$user){
-            throw new ResourceNotFoundException('user not found');
+            throw new ResourceNotFoundException(ConstHelper::USER);
         }
         if (!$token = Auth::attempt(['phone' => $phone,'password' => $password])){
-            throw new OperateFailedException('wrong password');
+            throw new OperateFailedException(ConstHelper::WRONG_PASSWORD);
         }
         if (!$token){
-            throw new OperateFailedException('token set failed');
+            throw new OperateFailedException(ConstHelper::TOKEN_SET_FAILED);
         }
         return $token;
     }

@@ -33,7 +33,7 @@ class FileHelper{
             $path[] = self::$upyunUrl.Storage::disk('upyun')->putFileAs('yake/'.date('Y').'/'.date('md'),$file,$file->getClientOriginalName(),'public');
         }
         if(!$path){
-            throw new OperateFailedException('file upload failed');
+            throw new OperateFailedException(ConstHelper::FILE_UPLOAD_FAILED);
         }
         return $path;
     }
@@ -48,13 +48,13 @@ class FileHelper{
             foreach ($file as $fileItem){
                 $ext = $fileItem->getClientOriginalExtension();
                 if (!in_array($ext,self::$allowedFileFormat)){
-                    throw new OperateFailedException('wrong file format');
+                    throw new OperateFailedException(ConstHelper::WRONG_FILE_FORMAT);
                 }
             }
         }else{
             $ext = $file->getClientOriginalExtension();
             if (!in_array($ext,self::$allowedFileFormat)){
-                throw new OperateFailedException('wrong file format');
+                throw new OperateFailedException(ConstHelper::WRONG_FILE_FORMAT);
             }
         }
     }

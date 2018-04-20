@@ -10,6 +10,7 @@ namespace App\Http\Controllers\User\Info;
 
 use App\Exceptions\ParamValidateFailedException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Helper\ConstHelper;
 use App\Helper\Controller;
 use App\Model\InfoFeedbackModel;
 use App\Model\InfoModel;
@@ -41,11 +42,11 @@ class InfoController extends Controller{
      */
     public function getDetail($infoId){
         if (!$infoId){
-            throw new ParamValidateFailedException('need infoId');
+            throw new ParamValidateFailedException();
         }
         $info = InfoModel::find($infoId);
         if (!$info){
-            throw new ResourceNotFoundException('info not found');
+            throw new ResourceNotFoundException(ConstHelper::INFO);
         }
         $infoFeedback = InfoFeedbackModel::where(['user_id' => UserModel::getCurUser()->id,'info_id' => $info->id])->first();
         $infoFeedback->status = 1;
