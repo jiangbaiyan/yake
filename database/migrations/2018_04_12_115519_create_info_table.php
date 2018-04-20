@@ -19,6 +19,7 @@ class CreateInfoTable extends Migration
             $table->string('title')->nullable()->comment('通知标题');
             $table->text('content')->nullable()->comment('通知内容');
             $table->string('limit')->nullable()->comment('通知对象限制条件');
+            $table->string('url')->nullable()->comment('通知附件上传url');
             $table->timestamps();
         });
     }

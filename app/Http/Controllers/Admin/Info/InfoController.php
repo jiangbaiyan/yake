@@ -22,8 +22,9 @@ class InfoController extends Controller{
      * 发送通知
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws ParamValidateFailedException
      * @throws OperateFailedException
+     * @throws ParamValidateFailedException
+     * @throws \App\Exceptions\UnAuthorizedException
      */
     public function send(Request $request){
         $validator = Validator::make($request->all(),[
@@ -37,7 +38,7 @@ class InfoController extends Controller{
         $limit = $request->input('limit','all&all');
         $title = $request->input('title');
         $content = $request->input('content');
-        WeChatService::sendModelInfo($title, $content, $limit);
+        WeChatService::sendModelInfo($title, $content, $limit,$request->has('file') ? $request->file('file'):[]);
         return $this->responseSuccess();
     }
 

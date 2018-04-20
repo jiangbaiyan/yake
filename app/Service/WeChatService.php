@@ -10,6 +10,7 @@ namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
 use App\Helper\ApiRequest;
+use App\Helper\FileHelper;
 use App\Model\InfoFeedbackModel;
 use App\Model\UserModel;
 use Illuminate\Http\Request;
@@ -18,7 +19,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class WeChatService{
+class WeChatService
+{
     use ApiRequest;
 
     //大荆口腔公众号基本配置
@@ -50,7 +52,8 @@ class WeChatService{
     /**
      * 第一步：用户同意授权，获取code
      */
-    public static function getCode(){
+    public static function getCode()
+    {
         $appid = self::$appId;
         $redirectUrl = urlencode(self::$baseUrl . '2');
         $requestUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=$appid&redirect_uri=$redirectUrl&response_type=code&scope=snsapi_userinfo&#wechat_redirect";
@@ -63,26 +66,27 @@ class WeChatService{
      * @return array|bool
      * @throws OperateFailedException
      */
-    public static function callback(Request $request){
+    public static function callback(Request $request)
+    {
         $appid = self::$appId;
         $appKey = self::$appKey;
         $code = $request->code;
         $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
         $res = self::sendRequest('GET', $requestUrl);
         if (isset($res['errcode'])) {
-            \Log::error('WeChat auth failed,message:'.$res['errmsg']);
+            \Log::error('WeChat auth failed,message:' . $res['errmsg']);
             throw new OperateFailedException($res['errmsg']);
         }
         $accessToken = $res['access_token'];
         $openid = $res['openid'];
-        $user = UserModel::where('openid',$openid)->first();
-        if ($user){
+        $user = UserModel::where('openid', $openid)->first();
+        if ($user) {
             throw new OperateFailedException('WeChat was registered');
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
-            \Log::error('WeChat auth failed,message:'.$res['errmsg']);
+            \Log::error('WeChat auth failed,message:' . $res['errmsg']);
             throw new OperateFailedException($userInfo['errmsg']);
         }
         if ($userInfo['sex'] == 1) {
@@ -104,7 +108,7 @@ class WeChatService{
             'avatar' => $userInfo['headimgurl']
         ]);
         $token = JWTAuth::fromUser($user);
-        if (!$token){
+        if (!$token) {
             throw new OperateFailedException('token set failed');
         }
         return $token;//注册成功，相当于成功登陆，返回token
@@ -117,58 +121,63 @@ class WeChatService{
      * @param $title
      * @param $content
      * @param $limit
+     * @param array $file
      * @throws OperateFailedException
      * @throws \App\Exceptions\UnAuthorizedException
+     * @throws \Throwable
      */
-    public static function sendModelInfo($title,$content,$limit){
+    public static function sendModelInfo($title, $content, $limit, $file = [])
+    {
         $user = UserModel::getCurUser();
         $limitStr = '全部患者';//这个为要存入数据库的限制条件字符串
         $config = self::$config;
         //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
         $config['data']['first']['value'] = $title;
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-        $res = UserModel::select('id','openid','phone');
-        $limit = explode('&',$limit);
+        $res = UserModel::select('id', 'openid', 'phone');
+        $limit = explode('&', $limit);
         //如果第一项年龄不是all，说明请求参数限制了年龄条件
-        if ($limit[0] != 'all'){
-            $ageLimit = explode(' ',$limit[0]);
-            $limitStr = $ageLimit[0].'~'.$ageLimit[1].'岁';
-            $res = $res->whereBetween('age',$ageLimit);
+        if ($limit[0] != 'all') {
+            $ageLimit = explode(' ', $limit[0]);
+            $limitStr = $ageLimit[0] . '~' . $ageLimit[1] . '岁';
+            $res = $res->whereBetween('age', $ageLimit);
         }
-        if ($limit[1] != 'all'){
+        if ($limit[1] != 'all') {
             //如果字符串仍为默认值，说明第一个年龄条件是all，直接覆盖默认值，否则在年龄条件后面追加空格+条件
-            if ($limitStr == '全部患者'){
+            if ($limitStr == '全部患者') {
                 $limitStr = $limit[1];
+            } else {
+                $limitStr .= ' ' . $limit[1];
             }
-            else{
-                $limitStr .= ' '.$limit[1];
-            }
-            $res = $res->where('sex',$limit[1]);
+            $res = $res->where('sex', $limit[1]);
         }
         $sendUsers = $res->get();
-        if (!$sendUsers){
+        if (!$sendUsers) {
             throw new OperateFailedException('no user in this query condition');
         }
-        $infoData = ['title' => $title,'content' => $content,'limit' => $limitStr];
-        $info = $user->infos()->create($infoData);
-        if (!$info){
-            throw new OperateFailedException('info created failed');
-        }
-        $access_token = self::getAccessToken();
-        $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$access_token";
-        foreach ($sendUsers as $sendUser){
-            $config['touser'] = $sendUser->openid;
-            $res = self::sendRequest('POST',$requestUrl,['json' => $config]);
-            if ($res['errmsg'] != 'ok'){
-                \Log::error('用户'.$sendUser->phone.'发送通知失败','错误信息为:'.$res['errmsg']);
-                throw new OperateFailedException($res['errmsg']);
+        \DB::transaction(function () use ($title, $content, $limitStr, $file, $user, $sendUsers) {
+            $fileUrl = implode(',', FileHelper::saveFile($file));
+            $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr, 'url' => $fileUrl];
+            $info = $user->infos()->create($infoData);
+            if (!$info) {
+                throw new OperateFailedException('info created failed');
             }
-            $insertData = ['user_id' => $sendUser->id,'info_id' => $info->id,'status' => 0];
-            $infoFeedback = InfoFeedbackModel::create($insertData);
-            if (!$infoFeedback){
-                throw new OperateFailedException('infoFeedback created failed');
+            $accessToken = self::getAccessToken();
+            $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
+            foreach ($sendUsers as $sendUser) {
+                $config['touser'] = $sendUser->openid;
+                $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
+                if ($res['errmsg'] != 'ok') {
+                    \Log::error('用户' . $sendUser->phone . '发送通知失败', '错误信息为:' . $res['errmsg']);
+                    throw new OperateFailedException($res['errmsg']);
+                }
+                $insertData = ['user_id' => $sendUser->id, 'info_id' => $info->id, 'status' => 0];
+                $infoFeedback = InfoFeedbackModel::create($insertData);
+                if (!$infoFeedback) {
+                    throw new OperateFailedException('infoFeedback created failed');
+                }
             }
-        }
+        });
     }
 
     /**
@@ -176,21 +185,21 @@ class WeChatService{
      * @return mixed
      * @throws OperateFailedException
      */
-    public static function getAccessToken(){
-        if (Cache::has('accessToken')){
+    public static function getAccessToken()
+    {
+        if (Cache::has('accessToken')) {
             $accessToken = Cache::get('accessToken');
-        }
-        else{
+        } else {
             $appid = self::$appId;
             $appKey = self::$appKey;
             $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appKey";
-            $res = self::sendRequest('GET',$url);
-            if (!isset($res['access_token'])){
+            $res = self::sendRequest('GET', $url);
+            if (!isset($res['access_token'])) {
                 \Log::error($res['errmsg']);
                 throw new OperateFailedException($res['errmsg']);
             }
             $accessToken = $res['access_token'];
-            Cache::put('accessToken',$accessToken,119);
+            Cache::put('accessToken', $accessToken, 119);
         }
         return $accessToken;
     }
