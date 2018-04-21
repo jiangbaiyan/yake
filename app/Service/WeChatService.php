@@ -28,7 +28,7 @@ class WeChatService
     private static $appId = 'wx48c158c300c446ec';
     private static $appKey = '3272591ea6a14977714f4d059d43d3ba';
     private static $baseUrl = 'https://yake.hzcloudservice.com/api/v1/common/getWeChatUserInfo/';
-    private static $frontUrl = '';//模板消息前端URL
+    private static $frontUrl = 'https://yake.hzcloudservice.com/mobilepages/detail.html?id=';//模板消息前端URL
     private static $config = [//模板消息基本配置
         'template_id' => 'VuCD_vLIZq0McLOM7IeGcjTsEfDbHwQbxM1VKRWBuY4',
         'url' => '',
@@ -91,11 +91,11 @@ class WeChatService
             throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
         }
         if ($userInfo['sex'] == 1) {
-            $sex = '男';
+            $sex = ConstHelper::MALE;
         } else if ($userInfo['sex'] == 2) {
-            $sex = '女';
+            $sex = ConstHelper::FEMALE;
         } else {
-            $sex = '未知';
+            $sex = ConstHelper::UNKNOWN;
         }
         $user = UserModel::create([
             'phone' => Session::get('phone'),
@@ -131,10 +131,6 @@ class WeChatService
     {
         $user = UserModel::getCurUser();
         $limitStr = ConstHelper::ALL;//这个为要存入数据库的限制条件字符串
-        $config = self::$config;
-        //fixme：等待前端页面 $config['url'] = self::$frontUrl.$info->id;
-        $config['data']['first']['value'] = $title;
-        $config['data']['keyword1']['value'] = date('Y-m-d H:i');
         $res = UserModel::select('id', 'openid', 'phone');
         $limit = explode('&', $limit);
         //如果第一项年龄不是all，说明请求参数限制了年龄条件
@@ -168,7 +164,7 @@ class WeChatService
             throw new OperateFailedException(ConstHelper::NO_QUERY_RESULT);
         }
         $infoData = ['title' => $title,'content' => $content,'limit' => $limitStr];
-        \DB::transaction(function () use ($infoData, $file, $user, $sendUsers, $config) {
+        \DB::transaction(function () use ($infoData, $file, $user, $sendUsers) {
             if ($file){
                 $filePath = implode(',', FileHelper::saveFile($file));
                 $infoData['url'] = $filePath;
@@ -178,6 +174,10 @@ class WeChatService
                 throw new OperateFailedException();
             }
             $accessToken = self::getAccessToken();
+            $config = self::$config;
+            $config['url'] = self::$frontUrl.$info->id;
+            $config['data']['first']['value'] = '《' . $infoData['title'] . '》';
+            $config['data']['keyword1']['value'] = date('Y-m-d H:i');
             $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
             foreach ($sendUsers as $sendUser) {
                 $config['touser'] = $sendUser->openid;

@@ -3,7 +3,6 @@
 namespace App\Model;
 
 use App\Exceptions\UnAuthorizedException;
-use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
