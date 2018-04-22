@@ -49,7 +49,7 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAllInfo(){
-        return $this->responseSuccess(InfoModel::simplePaginate(6));
+        return $this->responseSuccess(InfoModel::paginate(6));
     }
 
     /**
