@@ -137,6 +137,9 @@ class WeChatService
         if ($limit[0] != 'all') {
             $ageLimit = explode(' ', $limit[0]);
             $limitStr = $ageLimit[0] . '~' . $ageLimit[1] . '岁';
+            if ($ageLimit[0] > $ageLimit[1]){
+                throw new OperateFailedException();
+            }
             $res = $res->whereBetween('age', $ageLimit);
         }
         if ($limit[1] != 'all') {
