@@ -49,7 +49,7 @@ class InfoController extends Controller{
      * @return \Illuminate\Http\JsonResponse
      */
     public function getAllInfo(){
-        return $this->responseSuccess(InfoModel::paginate(6));
+        return $this->responseSuccess(InfoModel::latest()->paginate(6));
     }
 
     /**
@@ -71,6 +71,7 @@ class InfoController extends Controller{
             ->join('users','users.id','=','info_feedbacks.user_id')
             ->join('infos','info_feedbacks.info_id','=','infos.id')
             ->select('info_feedbacks.status','users.nickname','users.phone','infos.title')
+            ->orderBy('users.nickname')
             ->get();
         if (!$data){
             throw new ResourceNotFoundException(ConstHelper::NO_QUERY_RESULT);

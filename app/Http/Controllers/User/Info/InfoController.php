@@ -28,6 +28,7 @@ class InfoController extends Controller{
         $data = InfoFeedbackModel::join('infos','info_feedbacks.info_id','=','infos.id')
             ->where('info_feedbacks.user_id',$user->id)
             ->select('infos.*')
+            ->orderBy('infos.created_at')
             ->paginate(6);
         return $this->responseSuccess($data);
     }

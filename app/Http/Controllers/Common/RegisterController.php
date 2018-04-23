@@ -70,12 +70,13 @@ class RegisterController extends Controller{
     {
         switch ($step) {
             case 1://初次请求
-                $validator = Validator::make($request->all(), ['phone' => 'required', 'password' => 'required']);
+                $validator = Validator::make($request->all(), ['phone' => 'required', 'password' => 'required','age' => 'required']);
                 if ($validator->fails()) {
                     throw new ParamValidateFailedException($validator->messages());
                 }
                 Session::put('phone', $request->phone);
                 Session::put('password', $request->password);
+                Session::put('age',$request->age);
                 return $this->responseSuccess(WeChatService::getCode());
                 break;
             case 2://微信回调地址

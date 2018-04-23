@@ -98,11 +98,12 @@ class WeChatService
             $sex = ConstHelper::UNKNOWN;
         }
         $user = UserModel::create([
-            'phone' => Session::get('phone'),
-            'password' => Hash::make(Session::get('password')),
+            'phone' => Session::get('phone',''),
+            'password' => Hash::make(Session::get('password','')),
             'openid' => $openid,
             'nickname' => $userInfo['nickname'],
             'sex' => $sex,
+            'age' => Session::get('age',0),
             'city' => $userInfo['city'],
             'province' => $userInfo['province'],
             'country' => $userInfo['country'],
