@@ -8,7 +8,9 @@
 
 namespace App\Helper;
 
+use App\Exceptions\OperateFailedException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 trait ApiRequest
 {
@@ -23,11 +25,15 @@ trait ApiRequest
      */
     public static function sendRequest($requestType, $url, $params = null)
     {
-        $client = new Client();
-        if (isset($params)) {
-            $result = $client->request($requestType, $url, $params);
-        } else {
-            $result = $client->request($requestType, $url);
+        try{
+            $client = new Client();
+            if (isset($params)) {
+                $result = $client->request($requestType, $url, $params);
+            } else {
+                $result = $client->request($requestType, $url);
+            }
+        } catch (GuzzleException $e) {
+            throw new OperateFailedException('send request failed');
         }
         return json_decode($result->getBody(),true);
     }
