@@ -35,7 +35,7 @@ class InfoController extends Controller{
             'limit' => 'required',
         ]);
         if($validator->fails()){
-            throw new ParamValidateFailedException($validator->messages());
+            throw new ParamValidateFailedException($validator);
         }
         $limit = $request->input('limit','all&all');
         $title = $request->input('title');

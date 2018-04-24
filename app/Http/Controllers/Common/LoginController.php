@@ -14,6 +14,7 @@ use App\Helper\Controller;
 use App\Service\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 
 class LoginController extends Controller{
 
@@ -28,7 +29,7 @@ class LoginController extends Controller{
     public function login(Request $request){
         $validator = Validator::make($request->all(),['phone' => 'required','password' => 'required']);
         if ($validator->fails()){
-            throw new ParamValidateFailedException($validator->messages());
+            throw new ParamValidateFailedException($validator);
         }
         $token = LoginService::login($request->phone, $request->password);
         return $this->responseSuccess(['jwtToken' => $token]);

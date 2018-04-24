@@ -8,10 +8,17 @@
 namespace App\Exceptions;
 
 use App\Helper\ApiResponse;
+use Illuminate\Validation\Validator;
 
 class ParamValidateFailedException extends \Exception{
-    public function __construct($message = '')
+    public function __construct(Validator $validator = null)
     {
-        parent::__construct($message ? $message :ApiResponse::$paramErrorStr, ApiResponse::$CODE_PARAM_ERROR);
+        $message = ApiResponse::$paramErrorStr;
+        if (isset($validator)) {
+            foreach ($validator->messages() as $value) {
+                $message = $value[0];
+            };
+        }
+        parent::__construct($message,ApiResponse::$CODE_PARAM_ERROR);
     }
 }

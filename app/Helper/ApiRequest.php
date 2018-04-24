@@ -22,6 +22,7 @@ trait ApiRequest
      * @param $url
      * @param array $params
      * @return bool|mixed
+     * @throws OperateFailedException
      */
     public static function sendRequest($requestType, $url, $params = null)
     {

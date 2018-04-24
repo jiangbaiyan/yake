@@ -31,7 +31,7 @@ class RegisterController extends Controller{
     {
         $validator = Validator::make($request->all(), ['phone' => 'required|unique:users']);
         if ($validator->fails()) {
-            throw new ParamValidateFailedException($validator->messages());
+            throw new ParamValidateFailedException($validator);
         }
         $phone = $request->phone;
         SmsService::getCode($phone);
@@ -50,7 +50,7 @@ class RegisterController extends Controller{
     {
         $validator = Validator::make($request->all(), ['phone' => 'required|unique:users', 'code' => 'required']);
         if ($validator->fails()) {
-            throw new ParamValidateFailedException($validator->messages());
+            throw new ParamValidateFailedException($validator);
         }
         $phone = $request->phone;
         $code = $request->code;
@@ -72,7 +72,7 @@ class RegisterController extends Controller{
             case 1://初次请求
                 $validator = Validator::make($request->all(), ['phone' => 'required', 'password' => 'required','age' => 'required']);
                 if ($validator->fails()) {
-                    throw new ParamValidateFailedException($validator->messages());
+                    throw new ParamValidateFailedException($validator);
                 }
                 Session::put('phone', $request->phone);
                 Session::put('password', $request->password);
