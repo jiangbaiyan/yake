@@ -11,11 +11,12 @@ use App\Helper\ApiResponse;
 use Illuminate\Validation\Validator;
 
 class ParamValidateFailedException extends \Exception{
-    public function __construct(Validator $validator = null)
+    public function __construct(Validator $validator)
     {
         $message = ApiResponse::$paramErrorStr;
-        if (isset($validator)) {
-            foreach ($validator->messages() as $value) {
+        $msg = $validator->messages();
+        if (isset($msg)) {
+            foreach ($msg as $value) {
                 $message = $value[0];
             };
         }
