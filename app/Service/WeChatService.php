@@ -81,7 +81,7 @@ class WeChatService
             $res = self::sendRequest('GET', $requestUrl);
             if (isset($res['errcode'])) {
                 \Log::error($res['errmsg']);
-                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+                echo ConstHelper::WECHAT_ERROR;
             }
             $accessToken = $res['access_token'];
             $openid = $res['openid'];
@@ -90,13 +90,13 @@ class WeChatService
         }
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
-            throw new OperateFailedException(ConstHelper::WECHAT_EXIST);
+            echo ConstHelper::WECHAT_EXIST;
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
             \Log::error($res['errmsg']);
-            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            echo ConstHelper::WECHAT_ERROR;
         }
         if ($userInfo['sex'] == 1) {
             $sex = ConstHelper::MALE;
@@ -105,7 +105,7 @@ class WeChatService
         } else {
             $sex = ConstHelper::UNKNOWN;
         }
-        UserModel::create([
+        $user = UserModel::create([
             'phone' => Session::get('phone',''),
             'password' => Hash::make(Session::get('password','')),
             'openid' => $openid,
@@ -117,6 +117,7 @@ class WeChatService
             'country' => $userInfo['country'],
             'avatar' => $userInfo['headimgurl']
         ]);
+        return isset($user) ? true :false;
     }
 
     //-----------以下为发送模板消息相关接口---------------
