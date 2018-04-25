@@ -77,11 +77,12 @@ class RegisterController extends Controller{
                 Session::put('phone', $request->phone);
                 Session::put('password', $request->password);
                 Session::put('age',$request->age);
-                return $this->response('201','step 1 success',WeChatService::getCode());
+                return $this->responseSuccess(WeChatService::getCode());
                 break;
             case 2://微信回调地址
-                $token = WeChatService::callback($request);
-                return $this->responseSuccess(['jwtToken' => $token]);
+                WeChatService::callback($request);
+                header("refresh:3;url=https://yake.hzcloudservice/mobilepages/login.html");
+                print('<strong>恭喜您，注册成功！</strong>><br>三秒后自动跳转到登录界面。');
                 break;
         }
     }

@@ -117,11 +117,6 @@ class WeChatService
             'country' => $userInfo['country'],
             'avatar' => $userInfo['headimgurl']
         ]);
-        $token = JWTAuth::fromUser($user);
-        if (!$token) {
-            throw new OperateFailedException(ConstHelper::TOKEN_SET_FAILED);
-        }
-        return $token;//注册成功，相当于成功登陆，返回token
     }
 
     //-----------以下为发送模板消息相关接口---------------
