@@ -81,7 +81,7 @@ class WeChatService
             $res = self::sendRequest('GET', $requestUrl);
             if (isset($res['errcode'])) {
                 \Log::error($res['errmsg']);
-                echo ConstHelper::WECHAT_ERROR;
+                die(ConstHelper::WECHAT_ERROR);
             }
             $accessToken = $res['access_token'];
             $openid = $res['openid'];
@@ -90,13 +90,13 @@ class WeChatService
         }
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
-            echo ConstHelper::WECHAT_EXIST;
+            die(ConstHelper::WECHAT_EXIST);
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
             \Log::error($res['errmsg']);
-            echo ConstHelper::WECHAT_ERROR;
+            die(ConstHelper::WECHAT_ERROR);
         }
         if ($userInfo['sex'] == 1) {
             $sex = ConstHelper::MALE;

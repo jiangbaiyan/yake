@@ -85,7 +85,7 @@ class RegisterController extends Controller{
                     header("refresh:3;url=https://yake.hzcloudservice/mobilepages/login.html");
                 }
                 else{
-                    echo '抱歉，注册失败，请重试';
+                    die('抱歉，注册失败，请重试');
                 }
                 break;
         }
