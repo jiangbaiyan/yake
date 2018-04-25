@@ -18,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use phpDocumentor\Reflection\DocBlock\Tags\See;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class WeChatService
@@ -71,15 +72,22 @@ class WeChatService
     {
         $appid = self::$appId;
         $appKey = self::$appKey;
-        $code = $request->code;
-        $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
-        $res = self::sendRequest('GET', $requestUrl);
-        if (isset($res['errcode'])) {
-            \Log::error($res['errmsg']);
-            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+        if (Session::has('accessToken') && Session::has('openid')){
+            $accessToken = Session::get('accessToken');
+            $openid = Session::get('openid');
+        }else{
+            $code = $request->code;
+            $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
+            $res = self::sendRequest('GET', $requestUrl);
+            if (isset($res['errcode'])) {
+                \Log::error($res['errmsg']);
+                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            }
+            $accessToken = $res['access_token'];
+            $openid = $res['openid'];
+            Session::put('accessToken',$accessToken);
+            Session::put('openid',$openid);
         }
-        $accessToken = $res['access_token'];
-        $openid = $res['openid'];
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
             throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
