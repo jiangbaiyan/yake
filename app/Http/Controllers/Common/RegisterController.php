@@ -81,10 +81,12 @@ class RegisterController extends Controller{
                 break;
             case 2://微信回调地址
                 if (WeChatService::callback($request)){
-                    echo '<strong>恭喜您，注册成功！</strong>><br>三秒后自动跳转到登录界面。';
-                    header("refresh:3;url=https://yake.hzcloudservice/mobilepages/login.html");
+                    echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+                    echo '<strong>恭喜您，注册成功！</strong><br>三秒后自动跳转到登录界面。';
+                    header("refresh:3;url=https://yake.hzcloudservice.com/mobilepages/login.html");
                 }
                 else{
+                    echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                     die('抱歉，注册失败，请重试');
                 }
                 break;

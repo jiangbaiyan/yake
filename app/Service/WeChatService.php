@@ -81,6 +81,7 @@ class WeChatService
             $res = self::sendRequest('GET', $requestUrl);
             if (isset($res['errcode'])) {
                 \Log::error($res['errmsg']);
+                echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
                 die(ConstHelper::WECHAT_ERROR);
             }
             $accessToken = $res['access_token'];
@@ -90,12 +91,14 @@ class WeChatService
         }
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
             die(ConstHelper::WECHAT_EXIST);
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
         if (isset($userInfo['errcode'])) {
             \Log::error($res['errmsg']);
+            echo "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
             die(ConstHelper::WECHAT_ERROR);
         }
         if ($userInfo['sex'] == 1) {
