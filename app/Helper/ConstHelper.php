@@ -23,6 +23,7 @@ class  ConstHelper
         WECHAT_ERROR = '微信官方接口异常',
         SMS_ERROR = '短信官方接口异常',
         CODE = '后台短信验证码不存在',
+        WECHAT_EXIST = '您不能在公众号注册多个手机号',
 
         //患者个人信息相关
         FEMALE = '女',
@@ -31,7 +32,7 @@ class  ConstHelper
         ALL = '全部患者',
 
         //文件上传
-        WRONG_FILE_FORMAT = '文件格式错误',
+        WRONG_FILE_FORMAT = '不合法的文件格式',
         FILE_UPLOAD_FAILED = '文件上传过程中出现错误',
 
         //通知模块

@@ -90,7 +90,7 @@ class WeChatService
         }
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
-            throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            throw new OperateFailedException(ConstHelper::WECHAT_EXIST);
         }
         $pullUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=$accessToken&openid=$openid&lang=zh_CN";
         $userInfo = self::sendRequest('GET', $pullUserInfoUrl);
@@ -105,7 +105,7 @@ class WeChatService
         } else {
             $sex = ConstHelper::UNKNOWN;
         }
-        $user = UserModel::create([
+        UserModel::create([
             'phone' => Session::get('phone',''),
             'password' => Hash::make(Session::get('password','')),
             'openid' => $openid,
