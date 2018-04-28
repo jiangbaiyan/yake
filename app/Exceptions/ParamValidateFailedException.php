@@ -11,7 +11,7 @@ use App\Helper\ApiResponse;
 use Illuminate\Validation\Validator;
 
 class ParamValidateFailedException extends \Exception{
-    public function __construct(Validator $validator)
+    public function __construct(Validator $validator = null)
     {
         $message = ApiResponse::$paramErrorStr;
         $msg = $validator->messages()->toArray();

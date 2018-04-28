@@ -47,4 +47,8 @@ class UserModel extends Authenticatable implements JWTSubject
     public function infos(){
         return $this->hasMany(InfoModel::class,'user_id','id');
     }
+
+    public function coupons(){
+        return $this->hasMany(CouponModel::class,'user_id','id');
+    }
 }

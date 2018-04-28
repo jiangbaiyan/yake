@@ -27,11 +27,12 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('login', 'Common\LoginController@login');
 
     });
+
     Route::group(['middleware' => 'jwt'], function () {
         //管理员API
         Route::group(['prefix' => 'admin'], function () {
-            Route::group(['prefix' => 'info'], function () {
-                Route::group(['middleware' => 'isAdmin'], function () {
+            Route::group(['middleware' => 'isAdmin'], function () {
+                Route::group(['prefix' => 'info'], function () {
 
                     //发送通知
                     Route::post('send', 'Admin\Info\InfoController@send');
@@ -41,6 +42,13 @@ Route::group(['prefix' => 'v1'], function () {
 
                     //获取某条通知的反馈情况
                     Route::get('infoFeedback/{infoId}', 'Admin\Info\InfoController@getInfoFeedback');
+
+                });
+
+                Route::group(['prefix' => 'coupon'],function (){
+
+                    //发放优惠券
+                    Route::post('give','Admin\Coupon\CouponController@giveCoupons');
 
                 });
             });

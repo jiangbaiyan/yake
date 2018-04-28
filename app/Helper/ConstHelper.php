@@ -25,7 +25,6 @@ class  ConstHelper
         CODE = '后台短信验证码不存在',
         WECHAT_EXIST = '您不能在公众号注册多个手机号',
 
-        //患者个人信息相关
         FEMALE = '女',
         MALE = '男',
         UNKNOWN = '未知',
@@ -37,6 +36,13 @@ class  ConstHelper
 
         //通知模块
         INFO_FEEDBACK = '该通知的反馈不存在',
-        INFO = '通知不存在';
+        INFO = '通知不存在',
 
+        //时间
+        YEAR = 'year',
+        MONTH = 'month',
+        DAY = 'day',
+        HOUR = 'hour',
+        MINUTE = 'minute',
+        SECOND = 'second';
 }
