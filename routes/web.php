@@ -54,6 +54,8 @@ Route::group(['prefix' => 'v1'], function () {
             });
         });
 
+
+
         //普通用户API
         Route::group(['prefix' => 'user'], function () {
             Route::group(['prefix' => 'info'], function () {
@@ -64,6 +66,19 @@ Route::group(['prefix' => 'v1'], function () {
                 //获取收到的通知列表
                 Route::get('infoReceiveList', 'User\Info\InfoController@getInfoList');
 
+            });
+
+
+            Route::group(['prefix' => 'coupon'],function(){
+
+                //获取可领取的优惠券列表
+                Route::get('notGrabbedCoupon','User\Coupon\CouponController@getNotGrabbedCoupon');
+
+                //个人中心获取自己领取的优惠券
+                Route::get('ownCoupon','User\Coupon\CouponController@getOwnCoupon');
+
+                //领取优惠券
+                Route::get('coupon/{type}','User\Coupon\CouponController@getCoupon');
             });
         });
     });

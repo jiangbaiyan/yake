@@ -14,8 +14,8 @@ class ParamValidateFailedException extends \Exception{
     public function __construct(Validator $validator = null)
     {
         $message = ApiResponse::$paramErrorStr;
-        $msg = $validator->messages()->toArray();
-        if (isset($msg)) {
+        if (isset($validator)) {
+            $msg = $validator->messages()->toArray();
             foreach ($msg as $value) {
                 $message = $value[0];
             };

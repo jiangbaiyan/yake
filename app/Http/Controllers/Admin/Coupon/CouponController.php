@@ -10,10 +10,12 @@ namespace App\Http\Controllers\Admin\Coupon;
 
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ParamValidateFailedException;
+use App\Helper\ApiResponse;
+use App\Helper\ConstHelper;
 use App\Helper\Controller;
 use App\Model\CouponModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
 
 class CouponController extends Controller{
@@ -29,35 +31,33 @@ class CouponController extends Controller{
     public function giveCoupons(Request $request){
         $req = $request->all();
         $validator = Validator::make($req,[
-            'price' => 'required|min:0',
-            'type' => 'required|min:0',
-            'amount' => 'required|min:0',
-            'expireTime' => 'required|regex:/^\d+ [a-z]+$/'
+            'price' => 'required',
+            'type' => 'required',
+            'amount' => 'required',
+            'expireTime' => 'required|date'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
         }
-        //前端传过来过期时间形如 3 minute/1 hour/2 day/3 month
-        $timeArr = explode(' ',$req['expireTime']);
-        $count = $timeArr[0];
-        $timeType = $timeArr[1];
-        if ($count>1){
-            $timeType .= 's';
+        if ($req['price'] <0 || $req['type'] <0 || $req['type'] > 5 ||$req['amount'] <0){
+            throw new ParamValidateFailedException();
         }
-        $parseStr = "+".$count.' '.$timeType;
         \DB::beginTransaction();
         for ($i=0;$i<$req['amount'];$i++){
-            $conpon = CouponModel::create([
+            $coupon = CouponModel::create([
                 'price' => $req['price'],
                 'type' => $req['type'],
                 'status' => CouponModel::statusNotGrabbed,
-                'expire_time' => Carbon::parse($parseStr)->toDateTimeString()
+                'expire_time' => $req['expireTime']
             ]);
-            if (!$conpon){
+            if (!$coupon){
                 throw new OperateFailedException();
             }
+            //放入优惠券于列表
+            Redis::lpush($req['type'],$coupon->id);
         }
         \DB::commit();
         return $this->responseSuccess();
     }
+
 }

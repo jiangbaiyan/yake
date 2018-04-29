@@ -38,6 +38,10 @@ class  ConstHelper
         INFO_FEEDBACK = '该通知的反馈不存在',
         INFO = '通知不存在',
 
+        //优惠券模块
+        COUPON = '优惠券已经没有啦',
+        COUPON_EXIST = '一个类型的优惠券只能领取一张!',
+
         //时间
         YEAR = 'year',
         MONTH = 'month',
