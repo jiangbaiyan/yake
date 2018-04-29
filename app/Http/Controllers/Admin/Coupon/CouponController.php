@@ -32,9 +32,9 @@ class CouponController extends Controller{
         $req = $request->all();
         $validator = Validator::make($req,[
             'price' => 'required',
-            'type' => 'required',
-            'amount' => 'required',
-            'expireTime' => 'required|date'
+            'type' => 'required|integer',
+            'amount' => 'required|integer',
+            'expireTime' => 'required|date|after:now'
         ]);
         if ($validator->fails()){
             throw new ParamValidateFailedException($validator);
