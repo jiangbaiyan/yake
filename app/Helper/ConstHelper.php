@@ -40,7 +40,9 @@ class  ConstHelper
 
         //优惠券模块
         COUPON = '优惠券已经没有啦',
-        COUPON_EXIST = '一个类型的优惠券只能领取一张!',
+        COUPON_EXIST = '一个类型的优惠券最多领取3张!',
+        WRONG_COUPON_STATUS = '错误的优惠券状态',
+        COUPON_OVERDUE = '优惠券已过期',
 
         //时间
         YEAR = 'year',

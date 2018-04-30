@@ -44,7 +44,7 @@ class CouponController extends Controller{
     }
 
     /**
-     * 抢优惠券
+     * 领取优惠券
      * @param $type
      * @return \Illuminate\Http\JsonResponse
      * @throws OperateFailedException
@@ -60,12 +60,12 @@ class CouponController extends Controller{
         $user = UserModel::getCurUser();
         $couponModel = new CouponModel();
         //一种类型的优惠券,一个人只能在有效期内,获得一张
-        $couponIsExist = $couponModel->where('user_id',$user->id)
+        $couponCount = $couponModel->where('user_id',$user->id)
             ->where('status',$couponModel::statusGrabbed)
             ->where('expire_time','>=',date('Y-m-d H:i:s'))
             ->where('type',$type)
-            ->first();
-        if ($couponIsExist){
+            ->count();
+        if ($couponCount > 3){//领取的优惠券不能超过3张
             throw new OperateFailedException(ConstHelper::COUPON_EXIST);
         }
         \DB::beginTransaction();
@@ -78,12 +78,44 @@ class CouponController extends Controller{
         if (!$coupon){
             throw new ResourceNotFoundException(ConstHelper::COUPON);
         }
+        if ($coupon->status != $couponModel::statusNotGrabbed){
+            throw new OperateFailedException(ConstHelper::WRONG_COUPON_STATUS);
+        }
+        if ($coupon->expire_time < date('Y-m-d H:i:s')){
+            throw new OperateFailedException(ConstHelper::COUPON_OVERDUE);
+        }
         $coupon->user_id = $user->id;
         $coupon->status = $couponModel::statusGrabbed;
         if (!$coupon->save()){
             throw new OperateFailedException();
         }
         \DB::commit();
+        return $this->responseSuccess();
+    }
+
+    /**
+     * 使用优惠券
+     * @param $couponId
+     * @return \Illuminate\Http\JsonResponse
+     * @throws OperateFailedException
+     * @throws ResourceNotFoundException
+     */
+    public function useCoupon($couponId){
+        $couponModel = new CouponModel();
+        $coupon = $couponModel->find($couponId);
+        if (!$coupon){
+            throw new ResourceNotFoundException(ConstHelper::COUPON);
+        }
+        if ($coupon->status != $couponModel::statusGrabbed){
+            throw new OperateFailedException(ConstHelper::WRONG_COUPON_STATUS);
+        }
+        if ($coupon->expire_time < date('Y-m-d H:i:s')){
+            throw new OperateFailedException(ConstHelper::COUPON_OVERDUE);
+        }
+        $coupon->status = $couponModel::statusUsed;
+        if (!$coupon->save()){
+            throw new OperateFailedException();
+        }
         return $this->responseSuccess();
     }
 }

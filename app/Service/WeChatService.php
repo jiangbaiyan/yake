@@ -14,12 +14,11 @@ use App\Helper\ConstHelper;
 use App\Helper\FileHelper;
 use App\Model\InfoFeedbackModel;
 use App\Model\UserModel;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use phpDocumentor\Reflection\DocBlock\Tags\See;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class WeChatService
 {
@@ -42,7 +41,7 @@ class WeChatService
                 'value' => ''
             ],
             'keyword2' => [
-                'value' => '点我进入详情页查看',
+                'value' => '点我查看详情',
                 'color' => '#00B642'
             ],
             'remark' => [
@@ -126,7 +125,7 @@ class WeChatService
     //-----------以下为发送模板消息相关接口---------------
 
     /**
-     * 发送模板消息
+     * 通知系统发送通知(可带附件)
      * @param $title
      * @param $content
      * @param $limit
@@ -135,7 +134,7 @@ class WeChatService
      * @throws \App\Exceptions\UnAuthorizedException
      * @throws \Throwable
      */
-    public static function sendModelInfo($title, $content, $limit, $file)
+    public static function sendInfo($title, $content, $limit, $file)
     {
         $user = UserModel::getCurUser();
         $limitStr = ConstHelper::ALL;//这个为要存入数据库的限制条件字符串
@@ -184,19 +183,12 @@ class WeChatService
             if (!$info) {
                 throw new OperateFailedException();
             }
-            $accessToken = self::getAccessToken();
             $config = self::$config;
             $config['url'] = self::$frontUrl.$info->id;
             $config['data']['first']['value'] = '《' . $infoData['title'] . '》';
             $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-            $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
+            self::sendModelInfo($sendUsers,$config);
             foreach ($sendUsers as $sendUser) {
-                $config['touser'] = $sendUser->openid;
-                $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
-                if ($res['errmsg'] != 'ok') {
-                    \Log::error($res['errmsg']);
-                    throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
-                }
                 $insertData = ['user_id' => $sendUser->id, 'info_id' => $info->id, 'status' => 0];
                 $infoFeedback = InfoFeedbackModel::create($insertData);
                 if (!$infoFeedback) {
@@ -205,6 +197,40 @@ class WeChatService
             }
         });
     }
+
+
+    /**
+     * 给用户推送优惠券信息
+     * @param $amount
+     * @throws OperateFailedException
+     */
+    public static function sendCouponInfo($amount){
+        $config = self::$config;
+        //fixme:等待前端优惠券首页$config['url'] =
+        $config['data']['first']['value'] = '我们发放了'.$amount.'张优惠券等您来拿!';
+        $config['data']['keyword1']['value'] = date('Y-m-d H:i');
+        self::sendModelInfo(UserModel::all(),$config);
+    }
+
+    /**
+     * 通用发送模板消息方法
+     * @param Collection $receivers
+     * @param $config
+     * @throws OperateFailedException
+     */
+    public static function sendModelInfo(Collection $receivers,$config){
+        $accessToken = self::getAccessToken();
+        $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
+        foreach ($receivers as $receiver){
+            $config['touser'] = $receiver->openid;
+            $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
+            if ($res['errmsg'] != 'ok') {
+                \Log::error($res['errmsg']);
+                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            }
+        }
+    }
+
 
     /**
      * 获取access_token(微信基础支持)
@@ -229,4 +255,6 @@ class WeChatService
         }
         return $accessToken;
     }
+
+
 }

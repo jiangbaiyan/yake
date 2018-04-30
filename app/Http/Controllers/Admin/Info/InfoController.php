@@ -40,7 +40,7 @@ class InfoController extends Controller{
         $limit = $request->input('limit','all&all');
         $title = $request->input('title');
         $content = $request->input('content');
-        WeChatService::sendModelInfo($title, $content, $limit,$request->has('file') ? $request->file('file') : false);
+        WeChatService::sendInfo($title, $content, $limit,$request->has('file') ? $request->file('file') : false);
         return $this->responseSuccess();
     }
 

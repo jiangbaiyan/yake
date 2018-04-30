@@ -14,6 +14,8 @@ use App\Helper\ApiResponse;
 use App\Helper\ConstHelper;
 use App\Helper\Controller;
 use App\Model\CouponModel;
+use App\Model\UserModel;
+use App\Service\WeChatService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
@@ -56,8 +58,8 @@ class CouponController extends Controller{
             //放入优惠券于列表
             Redis::lpush($req['type'],$coupon->id);
         }
+        WeChatService::sendCouponInfo($req['amount']);
         \DB::commit();
         return $this->responseSuccess();
     }
-
 }

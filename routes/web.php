@@ -29,6 +29,7 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
     Route::group(['middleware' => 'jwt'], function () {
+
         //管理员API
         Route::group(['prefix' => 'admin'], function () {
             Route::group(['middleware' => 'isAdmin'], function () {
@@ -58,6 +59,7 @@ Route::group(['prefix' => 'v1'], function () {
 
         //普通用户API
         Route::group(['prefix' => 'user'], function () {
+
             Route::group(['prefix' => 'info'], function () {
 
                 //获取通知详情
@@ -78,7 +80,11 @@ Route::group(['prefix' => 'v1'], function () {
                 Route::get('ownCoupon','User\Coupon\CouponController@getOwnCoupon');
 
                 //领取优惠券
-                Route::get('coupon/{type}','User\Coupon\CouponController@getCoupon');
+                Route::get('get/{type}','User\Coupon\CouponController@getCoupon');
+
+                //使用优惠券
+                Route::get('use/{couponId}','User\Coupon\CouponController@useCoupon');
+
             });
         });
     });
