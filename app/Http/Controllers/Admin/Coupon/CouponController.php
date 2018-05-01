@@ -50,7 +50,8 @@ class CouponController extends Controller{
                 'price' => $req['price'],
                 'type' => $req['type'],
                 'status' => CouponModel::statusNotGrabbed,
-                'expire_time' => $req['expireTime']
+                'expire_time' => $req['expireTime'],
+                'sender_id' => UserModel::getCurUser()->id
             ]);
             if (!$coupon){
                 throw new OperateFailedException();
@@ -58,8 +59,20 @@ class CouponController extends Controller{
             //放入优惠券于列表
             Redis::lpush($req['type'],$coupon->id);
         }
-        WeChatService::sendCouponInfo($req['amount']);
+        //WeChatService::sendCouponInfo($req['amount']);
         \DB::commit();
         return $this->responseSuccess();
+    }
+
+
+    /**
+     * 管理员获取已经发送的优惠券列表(在期限内)
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Exceptions\UnAuthorizedException
+     */
+    public function getSentCoupon(){
+        $senderId = UserModel::getCurUser()->id;
+        $data = \DB::select('select count(*) as amount,status,type,price from coupons where sender_id = ? and expire_time >= ? group by type,status,price ',[$senderId,date('Y-m-d H:i:s')]);
+        return $this->responseSuccess($data);
     }
 }

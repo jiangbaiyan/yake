@@ -16,6 +16,7 @@ class CreateCouponsTable extends Migration
         Schema::create('coupons', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->nullable()->comment('用户id');
+            $table->integer('sender_id')->nullable()->comment('优惠券发送者id');
             $table->float('price')->nullable()->comment('优惠券金额');
             $table->tinyInteger('status')->nullable()->comment('优惠券状态 0-已发放未被抢 1-未使用 2-已使用');
             $table->tinyInteger('type')->nullable()->comment('优惠券种类 0-通用 1-矫正 2-镶牙 3-补牙 4-洗牙 5-种植牙');

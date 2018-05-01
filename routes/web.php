@@ -51,6 +51,8 @@ Route::group(['prefix' => 'v1'], function () {
                     //发放优惠券
                     Route::post('give','Admin\Coupon\CouponController@giveCoupons');
 
+                    //获取已发放的优惠券列表
+                    Route::get('getSentCoupon','Admin\Coupon\CouponController@getSentCoupon');
                 });
             });
         });
