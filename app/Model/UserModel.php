@@ -56,7 +56,7 @@ class UserModel extends Authenticatable implements JWTSubject
      * 管理员发放的优惠券关联
      */
     public function sendedCoupons(){
-        return $this->hasMany(InfoModel::class,'sender_id','id');
+        return $this->hasMany(CouponModel::class,'sender_id','id');
     }
 
     /**

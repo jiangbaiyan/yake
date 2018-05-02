@@ -59,7 +59,7 @@ class CouponController extends Controller{
             //放入优惠券于列表
             Redis::lpush($req['type'],$coupon->id);
         }
-        //WeChatService::sendCouponInfo($req['amount']);
+        WeChatService::sendCouponInfo($req['amount']);
         \DB::commit();
         return $this->responseSuccess();
     }
@@ -72,7 +72,7 @@ class CouponController extends Controller{
      */
     public function getSentCoupon(){
         $senderId = UserModel::getCurUser()->id;
-        $data = \DB::select('select count(*) as amount,status,type,price from coupons where sender_id = ? and expire_time >= ? group by type,status,price ',[$senderId,date('Y-m-d H:i:s')]);
+        $data = \DB::select('select count(*) as amount,status,type,price,expire_time,created_at from coupons where sender_id = ? and expire_time >= ? group by type,status,price,expire_time,created_at order by created_at desc ',[$senderId,date('Y-m-d H:i:s')]);
         return $this->responseSuccess($data);
     }
 }
