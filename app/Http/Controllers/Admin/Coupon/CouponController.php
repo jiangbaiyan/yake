@@ -57,7 +57,7 @@ class CouponController extends Controller{
                 throw new OperateFailedException();
             }
             //放入优惠券于列表
-            Redis::lpush($req['type'],$coupon->id);
+            Redis::lpush($req['type'].'-'.$req['price'],$coupon->id);
         }
         WeChatService::sendCouponInfo($req['amount']);
         \DB::commit();

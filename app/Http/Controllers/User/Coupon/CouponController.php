@@ -53,7 +53,7 @@ class CouponController extends Controller{
      * @throws \App\Exceptions\UnAuthorizedException
      * @throws \Exception
      */
-    public function getCoupon($type){
+    public function getCoupon($type,$price){
         if (!isset($type) || $type < 0 || $type > 5){
             throw new ParamValidateFailedException();
         }
@@ -70,7 +70,7 @@ class CouponController extends Controller{
         }
         \DB::beginTransaction();
         //从列表弹出特定种类的优惠券
-        $couponId = Redis::lpop($type);
+        $couponId = Redis::lpop($type.'-'.$price);
         if (!$couponId){
             throw new ResourceNotFoundException(ConstHelper::COUPON);
         }

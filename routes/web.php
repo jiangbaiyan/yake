@@ -85,7 +85,7 @@ Route::group(['prefix' => 'v1'], function () {
                 Route::get('ownCoupon','User\Coupon\CouponController@getOwnCoupon');
 
                 //领取优惠券
-                Route::get('get/{type}','User\Coupon\CouponController@getCoupon');
+                Route::get('get/{type}/{price}','User\Coupon\CouponController@getCoupon');
 
                 //使用优惠券
                 Route::get('use/{couponId}','User\Coupon\CouponController@useCoupon');
