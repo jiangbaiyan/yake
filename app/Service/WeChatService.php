@@ -9,6 +9,7 @@
 namespace App\Service;
 
 use App\Exceptions\OperateFailedException;
+use App\Exceptions\ParamValidateFailedException;
 use App\Helper\ApiRequest;
 use App\Helper\ConstHelper;
 use App\Helper\FileHelper;
@@ -102,8 +103,10 @@ class WeChatService
         }
         if ($userInfo['sex'] == 1) {
             $sex = ConstHelper::MALE;
-        } else {
+        } else if ($userInfo['sex'] == 2){
             $sex = ConstHelper::FEMALE;
+        } else{
+            $sex = null;
         }
         $user = UserModel::create([
             'phone' => Session::get('phone',''),
@@ -156,6 +159,8 @@ class WeChatService
                 case 'male':
                     $sex = ConstHelper::MALE;
                     break;
+                default:
+                    throw new ParamValidateFailedException();
             }
             if ($limitStr == ConstHelper::ALL) {
                 $limitStr = $sex;
