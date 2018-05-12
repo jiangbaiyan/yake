@@ -26,6 +26,9 @@ Route::group(['prefix' => 'v1'], function () {
         //登录
         Route::post('login', 'Common\LoginController@login');
 
+        //判断是否已经登录
+        Route::get('isLogin','Common\LoginController@isLogin');
+
     });
 
     Route::group(['middleware' => 'jwt'], function () {
@@ -87,6 +90,8 @@ Route::group(['prefix' => 'v1'], function () {
                 //使用优惠券
                 Route::get('use/{couponId}','User\Coupon\CouponController@useCoupon');
 
+                //获取自己的个人信息
+                Route::get('ownInfo','Common\LoginController@getOwnInfo');
             });
         });
     });

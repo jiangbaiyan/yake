@@ -10,7 +10,9 @@ namespace App\Http\Controllers\Common;
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ParamValidateFailedException;
 use App\Exceptions\ResourceNotFoundException;
+use App\Exceptions\UnAuthorizedException;
 use App\Helper\Controller;
+use App\Model\UserModel;
 use App\Service\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -33,5 +35,32 @@ class LoginController extends Controller{
         }
         $token = LoginService::login($request->phone, $request->password);
         return $this->responseSuccess(['jwtToken' => $token]);
+    }
+
+    /**
+     * 获取个人信息
+     * @throws \App\Exceptions\UnAuthorizedException
+     */
+    public function getOwnInfo(){
+        $user = UserModel::getCurUser();
+        $data = [
+            'nickname' => $user->nickname,
+            'age' => $user->age,
+            'sex' => $user->sex,
+            'avatar' => $user->avatar
+        ];
+        return $this->responseSuccess($data);
+    }
+
+    /**
+     * 判断当前用户是否登录
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Exceptions\UnAuthorizedException
+     */
+    public function isLogin(){
+        if (!$user = \Auth::user()){
+            throw new UnAuthorizedException();
+        }
+        return $this->responseSuccess();
     }
 }
