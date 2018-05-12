@@ -27,7 +27,6 @@ class  ConstHelper
 
         FEMALE = '女',
         MALE = '男',
-        UNKNOWN = '未知',
         ALL = '全部患者',
 
         //文件上传

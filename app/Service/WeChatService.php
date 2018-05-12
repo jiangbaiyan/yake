@@ -102,10 +102,8 @@ class WeChatService
         }
         if ($userInfo['sex'] == 1) {
             $sex = ConstHelper::MALE;
-        } else if ($userInfo['sex'] == 2) {
-            $sex = ConstHelper::FEMALE;
         } else {
-            $sex = ConstHelper::UNKNOWN;
+            $sex = ConstHelper::FEMALE;
         }
         $user = UserModel::create([
             'phone' => Session::get('phone',''),
@@ -157,9 +155,6 @@ class WeChatService
                     break;
                 case 'male':
                     $sex = ConstHelper::MALE;
-                    break;
-                default:
-                    $sex = ConstHelper::UNKNOWN;
                     break;
             }
             if ($limitStr == ConstHelper::ALL) {
