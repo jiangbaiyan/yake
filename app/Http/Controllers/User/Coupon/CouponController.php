@@ -65,7 +65,7 @@ class CouponController extends Controller{
             ->where('expire_time','>=',date('Y-m-d H:i:s'))
             ->where('type',$type)
             ->count();
-        if ($couponCount > 3){//领取的优惠券不能超过3张
+        if ($couponCount > 2){//领取的优惠券不能超过3张
             throw new OperateFailedException(ConstHelper::COUPON_EXIST);
         }
         \DB::beginTransaction();
