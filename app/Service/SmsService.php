@@ -35,7 +35,6 @@ class SmsService{
         $sendSms->setTemplateCode('SMS_126460515');
         $code = rand(1000, 9999);
         //设置Cache，为验证接口使用
-        Cache::put($phone.'Code',$code,3);
         $sendSms->setTemplateParam(compact('code'));
         $res = $client->execute($sendSms);
         $res = json_decode(json_encode($res),true);
@@ -44,6 +43,7 @@ class SmsService{
             \Log::error($res['Message']);
             throw new OperateFailedException(ConstHelper::SMS_ERROR);
         }
+        Cache::put($phone.'Code',$code,3);
     }
 
     /**
