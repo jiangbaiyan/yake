@@ -75,10 +75,10 @@ class WeChatService
         \DB::beginTransaction();
         $appid = self::$appId;
         $appKey = self::$appKey;
-        if (Session::has('accessToken') && Session::has('openid')){
+        if (Session::has('accessToken') && Session::has('openid')) {
             $accessToken = Session::get('accessToken');
             $openid = Session::get('openid');
-        }else{
+        } else {
             $code = $request->code;
             $requestUrl = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=$appid&secret=$appKey&code=$code&grant_type=authorization_code";
             $res = self::sendRequest('GET', $requestUrl);
@@ -89,8 +89,8 @@ class WeChatService
             }
             $accessToken = $res['access_token'];
             $openid = $res['openid'];
-            Session::put('accessToken',$accessToken);
-            Session::put('openid',$openid);
+            Session::put('accessToken', $accessToken);
+            Session::put('openid', $openid);
         }
         $user = UserModel::where('openid', $openid)->first();
         if ($user) {
@@ -106,19 +106,19 @@ class WeChatService
         }
         if ($userInfo['sex'] == 1) {
             $sex = ConstHelper::MALE;
-        } else if ($userInfo['sex'] == 2){
+        } else if ($userInfo['sex'] == 2) {
             $sex = ConstHelper::FEMALE;
-        } else{
+        } else {
             $sex = null;
         }
         //写入数据库
         $user = UserModel::create([
-            'phone' => Session::get('phone',''),
-            'password' => Hash::make(Session::get('password','')),
+            'phone' => Session::get('phone', ''),
+            'password' => Hash::make(Session::get('password', '')),
             'openid' => $openid,
             'nickname' => $userInfo['nickname'],
             'sex' => $sex,
-            'age' => Session::get('age',0),
+            'age' => Session::get('age', 0),
             'city' => $userInfo['city'],
             'province' => $userInfo['province'],
             'country' => $userInfo['country'],
@@ -130,14 +130,14 @@ class WeChatService
             'price' => CouponModel::initPrice,
             'status' => CouponModel::statusGrabbed,
             'type' => CouponModel::typeCommon,
-            'expire_time' => date('Y-m-d H:i:s',strtotime('+7days'))
+            'expire_time' => date('Y-m-d H:i:s', strtotime('+7days'))
         ]);
         $config = self::$config;
         $config['data']['first']['value'] = '新用户注册优惠券已放入您的账户中！';
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-        self::sendModelInfo($user,$config);
+        self::sendModelInfo($user, $config);
         \DB::commit();
-        return isset($user) && isset($coupon) ? true :false;
+        return isset($user) && isset($coupon) ? true : false;
     }
 
     //-----------以下为发送模板消息相关接口---------------
@@ -162,14 +162,14 @@ class WeChatService
         if ($limit[0] != 'all') {
             $ageLimit = explode(' ', $limit[0]);
             $limitStr = $ageLimit[0] . '~' . $ageLimit[1] . '岁';
-            if ($ageLimit[0] > $ageLimit[1]){
+            if ($ageLimit[0] > $ageLimit[1]) {
                 throw new OperateFailedException();
             }
             $res = $res->whereBetween('age', $ageLimit);
         }
         if ($limit[1] != 'all') {
             //如果字符串仍为默认值，说明第一个年龄条件是all，直接覆盖默认值，否则在年龄条件后面追加空格+条件
-            switch ($limit[1]){
+            switch ($limit[1]) {
                 case 'female':
                     $sex = ConstHelper::FEMALE;
                     break;
@@ -190,9 +190,9 @@ class WeChatService
         if (!$sendUsers) {
             throw new OperateFailedException(ConstHelper::NO_QUERY_RESULT);
         }
-        $infoData = ['title' => $title,'content' => $content,'limit' => $limitStr];
+        $infoData = ['title' => $title, 'content' => $content, 'limit' => $limitStr];
         \DB::transaction(function () use ($infoData, $file, $user, $sendUsers) {
-            if ($file){
+            if ($file) {
                 $filePath = implode(',', FileHelper::saveFile($file));
                 $infoData['url'] = $filePath;
             }
@@ -201,10 +201,10 @@ class WeChatService
                 throw new OperateFailedException();
             }
             $config = self::$config;
-            $config['url'] = self::$frontUrl.$info->id;
+            $config['url'] = self::$frontUrl . $info->id;
             $config['data']['first']['value'] = '《' . $infoData['title'] . '》';
             $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-            self::sendModelInfo($sendUsers,$config);
+            self::sendModelInfo($sendUsers, $config);
             foreach ($sendUsers as $sendUser) {
                 $insertData = ['user_id' => $sendUser->id, 'info_id' => $info->id, 'status' => 0];
                 $infoFeedback = InfoFeedbackModel::create($insertData);
@@ -221,12 +221,13 @@ class WeChatService
      * @param $amount
      * @throws OperateFailedException
      */
-    public static function sendCouponInfo($amount){
+    public static function sendCouponInfo($amount)
+    {
         $config = self::$config;
         $config['url'] = self::$couponIndexUrl;
-        $config['data']['first']['value'] = '我们发放了'.$amount.'张优惠券等您来拿!';
+        $config['data']['first']['value'] = '我们发放了' . $amount . '张优惠券等您来拿!';
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
-        self::sendModelInfo(UserModel::all(),$config);
+        self::sendModelInfo(UserModel::all(), $config);
     }
 
     /**
@@ -235,10 +236,12 @@ class WeChatService
      * @param $config
      * @throws OperateFailedException
      */
-    public static function sendModelInfo($receiver,$config){
+    public static function sendModelInfo($receiver, $config)
+    {
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
-            foreach ($receiver as $item){
+        if (count($receiver) > 1) {
+            foreach ($receiver as $item) {
                 $config['touser'] = $item->openid;
                 $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
                 if ($res['errmsg'] != 'ok') {
@@ -246,7 +249,15 @@ class WeChatService
                     throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
                 }
             }
+        } else {
+            $config['touser'] = $receiver->openid;
+            $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
+            if ($res['errmsg'] != 'ok') {
+                \Log::error($res['errmsg']);
+                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            }
         }
+    }
 
 
     /**
