@@ -20,8 +20,8 @@ class  ConstHelper
         WRONG_CODE = '验证码错误',
         TOKEN_SET_FAILED = 'token设置失败',
         NO_QUERY_RESULT = '数据库查询结果为空',
-        WECHAT_ERROR = '微信官方接口异常',
-        SMS_ERROR = '短信官方接口异常',
+        WECHAT_ERROR = '微信官方接口异常,请稍后重试',
+        SMS_ERROR = '短信官方接口异常,请稍后重试',
         CODE = '后台短信验证码不存在',
         WECHAT_EXIST = '您不能在公众号注册多个手机号',
 
@@ -39,7 +39,7 @@ class  ConstHelper
 
         //优惠券模块
         COUPON = '优惠券已经没有啦',
-        COUPON_EXIST = '一个类型的优惠券最多领取3张!',
+        COUPON_EXIST = '一个类型的优惠券最多领取3张！',
         WRONG_COUPON_STATUS = '错误的优惠券状态',
         COUPON_OVERDUE = '优惠券已过期',
 
