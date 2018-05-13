@@ -14,6 +14,9 @@ class  ConstHelper
     //返回错误信息相关
     const
 
+        BackUrl = 'https://yake.hzcloudservice.com/api/v1/',//后端URL
+        FrontUrl = 'https://yake.hzcloudservice.com/',//前端URL
+
         //通用模块
         USER = '用户不存在',
         WRONG_PASSWORD = '密码错误',

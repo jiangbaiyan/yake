@@ -29,9 +29,10 @@ class WeChatService
     //大荆口腔公众号基本配置
     private static $appId = 'wx48c158c300c446ec';
     private static $appKey = '3272591ea6a14977714f4d059d43d3ba';
-    private static $baseUrl = 'https://yake.hzcloudservice.com/api/v1/common/getWeChatUserInfo/';
-    private static $frontUrl = 'https://yake.hzcloudservice.com/mobilepages/detail.html?id=';//模板消息前端URL
-    private static $couponIndexUrl = 'https://yake.hzcloudservice.com/mobilepages/coupons.html';
+    private static $baseUrl = ConstHelper::BackUrl.'common/getWeChatUserInfo/';
+    private static $frontUrl = ConstHelper::FrontUrl.'mobilepages/detail.html?id=';//模板消息前端URL
+    private static $couponIndexUrl = ConstHelper::FrontUrl.'mobilepages/coupons.html';
+    private static $userCenterUrl = ConstHelper::FrontUrl.'mobilepages/index.html';
     private static $config = [//模板消息基本配置
         'template_id' => 'VuCD_vLIZq0McLOM7IeGcjTsEfDbHwQbxM1VKRWBuY4',
         'url' => '',
@@ -133,6 +134,7 @@ class WeChatService
             'expire_time' => date('Y-m-d H:i:s', strtotime('+7days'))
         ]);
         $config = self::$config;
+        $config['url'] = self::$userCenterUrl;
         $config['data']['first']['value'] = '新用户注册优惠券已放入您的账户中！';
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
         self::sendModelInfo($user, $config);
