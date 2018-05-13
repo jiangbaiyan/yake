@@ -13,6 +13,7 @@ use App\Exceptions\ParamValidateFailedException;
 use App\Helper\ApiRequest;
 use App\Helper\ConstHelper;
 use App\Helper\FileHelper;
+use App\Model\CouponModel;
 use App\Model\InfoFeedbackModel;
 use App\Model\UserModel;
 use Illuminate\Support\Collection;
@@ -71,6 +72,7 @@ class WeChatService
      */
     public static function callback(Request $request)
     {
+        \DB::beginTransaction();
         $appid = self::$appId;
         $appKey = self::$appKey;
         if (Session::has('accessToken') && Session::has('openid')){
@@ -109,6 +111,7 @@ class WeChatService
         } else{
             $sex = null;
         }
+        //写入数据库
         $user = UserModel::create([
             'phone' => Session::get('phone',''),
             'password' => Hash::make(Session::get('password','')),
@@ -121,7 +124,20 @@ class WeChatService
             'country' => $userInfo['country'],
             'avatar' => $userInfo['headimgurl']
         ]);
-        return isset($user) ? true :false;
+        //发送初始优惠券
+        $coupon = CouponModel::create([
+            'user_id' => $user->id,
+            'price' => CouponModel::initPrice,
+            'status' => CouponModel::statusGrabbed,
+            'type' => CouponModel::typeCommon,
+            'expire_time' => date('Y-m-d H:i:s',strtotime('+7days'))
+        ]);
+        $config = self::$config;
+        $config['data']['first']['value'] = '新用户注册优惠券已放入您的账户中！';
+        $config['data']['keyword1']['value'] = date('Y-m-d H:i');
+        self::sendModelInfo($user,$config);
+        \DB::commit();
+        return isset($user) && isset($coupon) ? true :false;
     }
 
     //-----------以下为发送模板消息相关接口---------------
@@ -215,22 +231,22 @@ class WeChatService
 
     /**
      * 通用发送模板消息方法
-     * @param Collection $receivers
+     * @param $receiver
      * @param $config
      * @throws OperateFailedException
      */
-    public static function sendModelInfo(Collection $receivers,$config){
+    public static function sendModelInfo($receiver,$config){
         $accessToken = self::getAccessToken();
         $requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=$accessToken";
-        foreach ($receivers as $receiver){
-            $config['touser'] = $receiver->openid;
-            $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
-            if ($res['errmsg'] != 'ok') {
-                \Log::error($res['errmsg']);
-                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+            foreach ($receiver as $item){
+                $config['touser'] = $item->openid;
+                $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
+                if ($res['errmsg'] != 'ok') {
+                    \Log::error($res['errmsg']);
+                    throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+                }
             }
         }
-    }
 
 
     /**

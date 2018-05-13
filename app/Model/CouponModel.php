@@ -19,7 +19,7 @@ class CouponModel extends Model
         statusUsed = 2;//已使用
 
     /**
-     *  优惠券种类
+     * 优惠券种类
      */
     const
         typeCommon = 0,//通用
@@ -29,4 +29,9 @@ class CouponModel extends Model
         typeWash = 4,//洗牙
         typePlant = 5;//种植牙
 
+    /**
+     * 其他
+     */
+    const
+        initPrice = 5;//新用户注册初始优惠券金额
 }
