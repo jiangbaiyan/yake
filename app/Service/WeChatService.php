@@ -30,6 +30,7 @@ class WeChatService
     private static $appKey = '3272591ea6a14977714f4d059d43d3ba';
     private static $baseUrl = 'https://yake.hzcloudservice.com/api/v1/common/getWeChatUserInfo/';
     private static $frontUrl = 'https://yake.hzcloudservice.com/mobilepages/detail.html?id=';//模板消息前端URL
+    private static $couponIndexUrl = 'https://yake.hzcloudservice.com/mobilepages/coupons.html';
     private static $config = [//模板消息基本配置
         'template_id' => 'VuCD_vLIZq0McLOM7IeGcjTsEfDbHwQbxM1VKRWBuY4',
         'url' => '',
@@ -206,7 +207,7 @@ class WeChatService
      */
     public static function sendCouponInfo($amount){
         $config = self::$config;
-        //fixme:等待前端优惠券首页$config['url'] =
+        $config['url'] = self::$couponIndexUrl;
         $config['data']['first']['value'] = '我们发放了'.$amount.'张优惠券等您来拿!';
         $config['data']['keyword1']['value'] = date('Y-m-d H:i');
         self::sendModelInfo(UserModel::all(),$config);

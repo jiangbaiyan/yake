@@ -10,8 +10,6 @@ namespace App\Http\Controllers\Admin\Coupon;
 
 use App\Exceptions\OperateFailedException;
 use App\Exceptions\ParamValidateFailedException;
-use App\Helper\ApiResponse;
-use App\Helper\ConstHelper;
 use App\Helper\Controller;
 use App\Model\CouponModel;
 use App\Model\UserModel;
