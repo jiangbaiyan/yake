@@ -31,7 +31,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     });
 
-    Route::group(['middleware' => 'jwt'], function () {
+    Route::group(['middleware' => 'auth:api'], function () {
 
         //管理员API
         Route::group(['prefix' => 'admin'], function () {
