@@ -48,9 +48,13 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Http\Request $request
      * @param  \Exception $exception
      * @return \Illuminate\Http\JsonResponse
+     * @throws UnAuthorizedException
      */
     public function render($request, Exception $exception)
     {
+        if ($exception->getMessage() == 'Unauthenticated.'){
+            throw new UnAuthorizedException();
+        }
         return $this->response($exception->getCode(),$exception->getMessage());
     }
 }
