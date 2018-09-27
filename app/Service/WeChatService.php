@@ -16,7 +16,6 @@ use App\Helper\FileHelper;
 use App\Model\CouponModel;
 use App\Model\InfoFeedbackModel;
 use App\Model\UserModel;
-use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -248,7 +247,7 @@ class WeChatService
                 $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
                 if ($res['errmsg'] != 'ok') {
                     \Log::error($res['errmsg']);
-                    throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
+                    continue;
                 }
             }
         } else {
@@ -256,7 +255,6 @@ class WeChatService
             $res = self::sendRequest('POST', $requestUrl, ['json' => $config]);
             if ($res['errmsg'] != 'ok') {
                 \Log::error($res['errmsg']);
-                throw new OperateFailedException(ConstHelper::WECHAT_ERROR);
             }
         }
     }

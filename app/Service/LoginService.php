@@ -31,9 +31,6 @@ class LoginService{
         if (!$token = Auth::attempt(['phone' => $phone,'password' => $password])){
             throw new OperateFailedException(ConstHelper::WRONG_PASSWORD);
         }
-        if (!$token){
-            throw new OperateFailedException(ConstHelper::TOKEN_SET_FAILED);
-        }
         return $token;
     }
 }

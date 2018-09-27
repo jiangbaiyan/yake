@@ -62,7 +62,7 @@ class RegisterController extends Controller{
      * 微信网页授权并拉取用户个人信息
      * @param $step
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\JsonResponse
      * @throws OperateFailedException
      * @throws ParamValidateFailedException
      */
